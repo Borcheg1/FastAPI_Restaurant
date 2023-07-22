@@ -16,7 +16,7 @@ class Menus(Base):
     description: Mapped[str] = mapped_column(TEXT)
 
 
-class SubMenus(Base):
+class Submenus(Base):
     __tablename__ = "submenus"
 
     submenu_id: Mapped[uuid4] = mapped_column(UUID, primary_key=True, default=uuid4)
@@ -28,7 +28,7 @@ class SubMenus(Base):
 class Dishes(Base):
     __tablename__ = "dishes"
 
-    dishes_id: Mapped[uuid4] = mapped_column(UUID, primary_key=True, default=uuid4)
+    dish_id: Mapped[uuid4] = mapped_column(UUID, primary_key=True, default=uuid4)
     title: Mapped[str] = mapped_column(VARCHAR(80), nullable=True)
     price: Mapped[decimal.Decimal] = mapped_column(DECIMAL(2, 10))
     submenu_id: Mapped[uuid4] = mapped_column(ForeignKey("submenus.submenu_id", ondelete="CASCADE"))
