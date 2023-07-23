@@ -29,5 +29,6 @@ class Dishes(Base):
 
     id: Mapped[uuid4] = mapped_column(UUID, primary_key=True, default=uuid4)
     title: Mapped[str] = mapped_column(VARCHAR(80), nullable=True, unique=True)
-    price: Mapped[decimal.Decimal] = mapped_column(DECIMAL(2, 10))
+    description: Mapped[str] = mapped_column(TEXT)
+    price: Mapped[decimal.Decimal] = mapped_column(DECIMAL(10, 2))
     submenu_id: Mapped[uuid4] = mapped_column(ForeignKey("submenus.id", ondelete="CASCADE"))
