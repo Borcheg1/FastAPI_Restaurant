@@ -1,12 +1,12 @@
 from fastapi import FastAPI
 
 from src.database import create_tables
-from src.menus.router import router as menus_router
+from src.routers import router
 
 
 app = FastAPI(title="Restaurant API")
 
-app.include_router(menus_router)
+app.include_router(router, prefix="/api/v1")
 
 
 @app.on_event("startup")
