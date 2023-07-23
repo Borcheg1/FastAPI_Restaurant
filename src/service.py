@@ -1,3 +1,6 @@
+import decimal
+
+
 class ConvertDataToJson:
 
     @staticmethod
@@ -44,6 +47,27 @@ class ConvertDataToJson:
         return json_data
 
     @staticmethod
+    async def get_dishes(result):
+        json_data = []
+
+        for row in result.fetchall():
+            if not row:
+                return json_data
+            dish_id, title, description, price = row[0], row[1], row[2], row[3]
+
+            json_data.extend(
+                [
+                    {
+                        "id": dish_id,
+                        "title": title,
+                        "description": description,
+                        "price": f"{price:.2f}"
+                    }
+                ]
+            )
+        return json_data
+
+    @staticmethod
     async def get_menu_by_id(result):
         row = result.fetchone()
         if not row:
@@ -76,6 +100,22 @@ class ConvertDataToJson:
         return json_data
 
     @staticmethod
+    async def create_dish_response(result):
+        row = result.fetchone()
+        if not row:
+            return None
+        current_id, title, description, price = row[0], row[1], row[2], row[3]
+
+        json_data = {
+            "id": current_id,
+            "title": title,
+            "description": description,
+            "price": str(price)
+        }
+
+        return json_data
+
+    @staticmethod
     async def get_submenu_by_id(result):
         row = result.fetchone()
         if not row:
@@ -87,6 +127,22 @@ class ConvertDataToJson:
             "title": title,
             "description": desc,
             "dishes_count": dishes_count
+        }
+
+        return json_data
+
+    @staticmethod
+    async def get_dish_by_id(result):
+        row = result.fetchone()
+        if not row:
+            return None
+        dish_id, title, description, price = row[0], row[1], row[2], row[3]
+
+        json_data = {
+            "id": dish_id,
+            "title": title,
+            "description": description,
+            "price": str(price)
         }
 
         return json_data
