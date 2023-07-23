@@ -1,14 +1,11 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status, HTTPException
-from sqlalchemy import select, insert, func, distinct, update, delete
-from sqlalchemy.exc import IntegrityError
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
-from src.models import Menus, Submenus, Dishes
-from src.schemas import CreateMenu, CreateSubmenu
-from src.service import ConvertDataToJson
+from src.dishes.router import DishVehicle
+from src.schemas import CreateMenu, CreateSubmenu, CreateDish
 from src.menus.router import MenuVehicle
 from src.submenus.router import SubmenuVehicle
 
@@ -100,4 +97,49 @@ async def delete_submenu(
         session: AsyncSession = Depends(get_async_session)
 ):
     response = await SubmenuVehicle.delete_submenu(target_submenu_id, session)
+    return response
+
+
+@router.get("/{target_menu_id}/submenus/{target_submenu_id}/dishes", status_code=status.HTTP_200_OK)
+async def get_all_dishes(session: AsyncSession = Depends(get_async_session)):
+    response = await DishVehicle.get_all_dishes(session)
+    return response
+
+
+@router.get("/{target_menu_id}/submenus/{target_submenu_id}/dishes/{target_dish_id}", status_code=status.HTTP_200_OK)
+async def get_dish_by_id(
+        target_dish_id: str | UUID,
+        session: AsyncSession = Depends(get_async_session)
+):
+    response = await DishVehicle.get_dish_by_id(target_dish_id, session)
+    print(response)
+    return response
+
+
+@router.post("/{target_menu_id}/submenus/{target_submenu_id}/dishes", status_code=status.HTTP_201_CREATED)
+async def add_dish(
+        target_submenu_id: str | UUID,
+        new_dish: CreateDish,
+        session: AsyncSession = Depends(get_async_session)
+):
+    response = await DishVehicle.add_dish(target_submenu_id, new_dish, session)
+    return response
+
+
+@router.patch("/{target_menu_id}/submenus/{target_submenu_id}/dishes/{target_dish_id}", status_code=status.HTTP_200_OK)
+async def update_dish(
+        target_dish_id: str | UUID,
+        new_dish: CreateDish,
+        session: AsyncSession = Depends(get_async_session)
+):
+    response = await DishVehicle.update_dish(target_dish_id, new_dish, session)
+    return response
+
+
+@router.delete("/{target_menu_id}/submenus/{target_submenu_id}/dishes/{target_dish_id}", status_code=status.HTTP_200_OK)
+async def delete_dish(
+        target_dish_id: str | UUID,
+        session: AsyncSession = Depends(get_async_session)
+):
+    response = await DishVehicle.delete_dish(target_dish_id, session)
     return response
