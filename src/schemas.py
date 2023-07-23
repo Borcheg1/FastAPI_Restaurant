@@ -1,3 +1,5 @@
+import decimal
+
 from pydantic import BaseModel, constr
 
 
@@ -13,4 +15,5 @@ class CreateSubmenu(BaseModel):
 
 class CreateDish(BaseModel):
     title: constr(max_length=80)
-    price: float
+    description: str | None = None
+    price: decimal.Decimal
