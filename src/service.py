@@ -1,6 +1,3 @@
-import decimal
-
-
 class ConvertDataToJson:
 
     @staticmethod
@@ -80,37 +77,6 @@ class ConvertDataToJson:
             "description": desc,
             "submenus_count": submenus_count,
             "dishes_count": dishes_count
-        }
-
-        return json_data
-
-    @staticmethod
-    async def create_response(result):
-        row = result.fetchone()
-        if not row:
-            return None
-        current_id, title, desc = row[0], row[1], row[2]
-
-        json_data = {
-            "id": current_id,
-            "title": title,
-            "description": desc
-        }
-
-        return json_data
-
-    @staticmethod
-    async def create_dish_response(result):
-        row = result.fetchone()
-        if not row:
-            return None
-        current_id, title, description, price = row[0], row[1], row[2], row[3]
-
-        json_data = {
-            "id": current_id,
-            "title": title,
-            "description": description,
-            "price": str(price)
         }
 
         return json_data

@@ -3,12 +3,7 @@ import decimal
 from pydantic import BaseModel, constr
 
 
-class CreateMenu(BaseModel):
-    title: constr(max_length=80)
-    description: str | None = None
-
-
-class CreateSubmenu(BaseModel):
+class CreateMenuOrSubmenu(BaseModel):
     title: constr(max_length=80)
     description: str | None = None
 
