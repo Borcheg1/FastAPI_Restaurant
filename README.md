@@ -6,7 +6,8 @@
 
 ### An application that allows you to perform CRUD operations for a chain of menus, submenus and dishes.
 
-## Guide for installing and launching the application
+# Guide for installing and launching the application
+## First option for local database
 
 1. Open a terminal and enter the command
 `git clone https://github.com/Borcheg1/FastAPI_Restaurant.git`
@@ -23,14 +24,30 @@
    
     Windows: `env\Scripts\activate`
 
-6. Install required libraries:
+5. Install required libraries:
 `pip install -r requirements.txt`
 
-7. Rename the `env_example` file to `.env` in the root folder of the project and change the variables for your database.
+6. Rename the `env_example` file to `.env` in the root folder of the project and change the variables for your database. Including set `DB_HOST=localhost`
 
-8. Run the application `uvicorn src.main:app`
+7. Run the application `uvicorn src.main:app`
 
-9. Open a browser and go to `localhost:8000/docs#/`
+8. Open a browser and go to `localhost:8000/docs#/`
+
+**Are you ready for the tests!**
+
+## Second option for docker
+
+1. Open a terminal and enter the command
+`git clone https://github.com/Borcheg1/FastAPI_Restaurant.git`
+
+2. Change to the project's working directory:
+`cd FastAPI_Restaurant`
+
+3. Rename the `env_example` file to `.env` in the root folder of the project
+
+4. Enter the command `docker-compose up --build` and wait for the containers to build
+
+5. Open a browser and go to `localhost:8000/docs#/`
 
 **Are you ready for the tests!**
 
