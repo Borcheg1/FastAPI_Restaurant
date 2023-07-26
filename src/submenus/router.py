@@ -1,190 +1,123 @@
-from typing import List, Dict
+from typing import List
 from uuid import UUID
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status, APIRouter
 from sqlalchemy import select, insert, func, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
 from src.models import Submenus, Dishes
-from src.schemas import CreateMenuOrSubmenu
-from src.service import ConvertDataToJson
+from src.schemas import BaseRequestModel, ResponseSubmenu, ResponseMessage
+
+router = APIRouter()
+
+main_query = select(
+    Submenus.id,
+    Submenus.title,
+    Submenus.description,
+    func.count(Dishes.title)
+).outerjoin(
+    Dishes, Submenus.id == Dishes.submenu_id
+).group_by(
+    Submenus.id
+)
+
+col = Submenus.__table__.columns.keys()
 
 
-class SubmenuVehicle:
+@router.get("/", status_code=status.HTTP_200_OK, response_model=List[ResponseSubmenu])
+async def get_all_submenus(target_menu_id: UUID,
+                           session: AsyncSession = Depends(get_async_session)
+                           ) -> List[ResponseSubmenu]:
     """
-    Class which should be router, but something went wrong :(
-
-    Methods make queries and statements to db about submenus.
+    Get dishes list from db and return them.
     """
+    result = await session.execute(main_query.where(Submenus.menu_id == target_menu_id))
+    rows = result.fetchall()
+    submenus = [ResponseSubmenu(**(dict(zip(col, row), **{"dishes_count": row[-1]}))) for row in rows]
+    return submenus
 
-    @staticmethod
-    async def get_all_submenus(
-            session: AsyncSession = Depends(get_async_session)) -> List[Dict] | List | Dict:
-        """
-        Get dishes list from db and return them.
-        """
-        try:
-            query = select(
-                Submenus.id,
-                Submenus.title,
-                Submenus.description,
-                func.count(Dishes.title)
-            ).outerjoin(
-                Dishes, Submenus.id == Dishes.submenu_id
-            ).group_by(
-                Submenus.id
-            )
 
-        except Exception as error:
-            return {
-                "status": "Error",
-                "detail": error,
-                "message": "Something went wrong!"
-            }
+@router.get("/{target_submenu_id}", status_code=status.HTTP_200_OK, response_model=ResponseSubmenu)
+async def get_submenu_by_id(target_submenu_id: str | UUID,
+                            session: AsyncSession = Depends(get_async_session)
+                            ) -> ResponseSubmenu:
+    """
+    Get submenu from db and return it.
 
-        result = await session.execute(query)
-        response = await ConvertDataToJson.get_submenus(result)
-        return response
+    target_submenu_id: Current submenu id.
+    """
+    query = main_query.where(target_submenu_id == Submenus.id)
+    result = await session.execute(query)
+    row = result.fetchone()
 
-    @staticmethod
-    async def get_submenu_by_id(
-            target_submenu_id: str | UUID,
-            session: AsyncSession = Depends(get_async_session)) -> Dict:
-        """
-        Get submenu from db and return it.
+    if not row:
+        raise HTTPException(status_code=404, detail='submenu not found')
 
-        target_submenu_id: Current submenu id.
-        """
-        try:
-            query = select(
-                Submenus.id,
-                Submenus.title,
-                Submenus.description,
-                func.count(Dishes.title)
-            ).outerjoin(
-                Dishes, Submenus.id == Dishes.submenu_id
-            ).group_by(
-                Submenus.id
-            ).where(target_submenu_id == Submenus.id)
+    submenu = dict(zip(col, row), **{"dishes_count": row[-1]})
+    return ResponseSubmenu(**submenu)
 
-        except Exception as error:
-            return {
-                "status": "Error",
-                "detail": error,
-                "message": "Something went wrong!"
-            }
 
-        result = await session.execute(query)
-        response = await ConvertDataToJson.get_submenu_by_id(result)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=ResponseSubmenu)
+async def add_menu(target_menu_id: str | UUID,
+                   new_submenu: BaseRequestModel,
+                   session: AsyncSession = Depends(get_async_session)
+                   ) -> ResponseSubmenu:
+    """
+    Add new submenu to db and return it.
 
-        if not response:
-            raise HTTPException(status_code=404, detail='submenu not found')
-        return response
+    target_menu_id: Current menu id.
+    new_submenu: Pydantic schema for request body.
+    """
+    new_submenu_dict = dict(new_submenu, **{"menu_id": target_menu_id})
+    stmt = insert(Submenus).values(**new_submenu_dict)
+    query = main_query.where(Submenus.title == new_submenu.title)
+    await session.execute(stmt)
+    await session.commit()
+    result = await session.execute(query)
+    row = result.fetchone()
+    submenu = dict(zip(col, row), **{"dishes_count": row[-1]})
+    return ResponseSubmenu(**submenu)
 
-    @staticmethod
-    async def add_submenu(
-            target_menu_id: str | UUID,
-            new_submenu: CreateMenuOrSubmenu,
-            session: AsyncSession = Depends(get_async_session)) -> Dict:
-        """
-        Add new submenu to db and return it.
 
-        target_menu_id: Current menu id.
-        new_submenu: Pydantic schema for request body.
-        """
-        new_submenu_dict = dict(new_submenu)
-        new_submenu_dict["menu_id"] = target_menu_id
-        try:
-            stmt = insert(Submenus).values(**dict(new_submenu_dict))
-            await session.execute(stmt)
-            await session.commit()
+@router.patch("/{target_submenu_id}", status_code=status.HTTP_200_OK, response_model=ResponseSubmenu)
+async def update_submenu(target_submenu_id: str | UUID,
+                         new_submenu: BaseRequestModel,
+                         session: AsyncSession = Depends(get_async_session)
+                         ) -> ResponseSubmenu:
+    """
+    Update submenu in db and return it.
 
-            query = select(
-                Submenus.id,
-                Submenus.title,
-                Submenus.description,
-                func.count(Dishes.title)
-            ).outerjoin(
-                Dishes, Submenus.id == Dishes.submenu_id
-            ).group_by(
-                Submenus.id
-            ).where(Submenus.title == new_submenu.title)
+    target_submenu_id: Current submenu id.
+    new_submenu: Pydantic schema for request body.
+    """
+    stmt = update(Submenus).where(target_submenu_id == Submenus.id).values(**dict(new_submenu))
+    query = main_query.where(target_submenu_id == Submenus.id)
+    await session.execute(stmt)
+    await session.commit()
+    result = await session.execute(query)
+    row = result.fetchone()
 
-        except Exception as error:
-            return {
-                "status": "Error",
-                "detail": error,
-                "message": "Something went wrong!"
-            }
+    if not row:
+        raise HTTPException(status_code=404, detail='submenu not found')
 
-        result = await session.execute(query)
-        response = await ConvertDataToJson.get_submenu_by_id(result)
-        return response
+    submenu = dict(zip(col, row), **{"dishes_count": row[-1]})
+    return ResponseSubmenu(**submenu)
 
-    @staticmethod
-    async def update_submenu(
-            target_submenu_id: str | UUID,
-            new_submenu: CreateMenuOrSubmenu,
-            session: AsyncSession = Depends(get_async_session)) -> Dict:
-        """
-        Update submenu in db and return it.
 
-        target_submenu_id: Current submenu id.
-        new_submenu: Pydantic schema for request body.
-        """
-        try:
-            stmt = update(Submenus).where(target_submenu_id == Submenus.id).values(**dict(new_submenu))
-            await session.execute(stmt)
-            await session.commit()
+@router.delete("/{target_submenu_id}", status_code=status.HTTP_200_OK, response_model=ResponseMessage)
+async def delete_submenu(target_submenu_id: str | UUID,
+                         session: AsyncSession = Depends(get_async_session)
+                         ) -> ResponseMessage:
+    """
+    Delete submenu from db and return message.
 
-            query = select(
-                Submenus.id,
-                Submenus.title,
-                Submenus.description,
-                func.count(Dishes.title)
-            ).outerjoin(
-                Dishes, Submenus.id == Dishes.submenu_id
-            ).group_by(
-                Submenus.id
-            ).where(target_submenu_id == Submenus.id)
-
-        except Exception as error:
-            return {
-                "status": "Error",
-                "detail": error,
-                "message": "Something went wrong!"
-            }
-
-        result = await session.execute(query)
-        response = await ConvertDataToJson.get_submenu_by_id(result)
-
-        if not response:
-            raise HTTPException(status_code=404, detail='submenu not found')
-        return response
-
-    @staticmethod
-    async def delete_submenu(
-            target_submenu_id: str | UUID,
-            session: AsyncSession = Depends(get_async_session)) -> Dict:
-        """
-        Delete submenu from db and return message.
-
-        target_submenu_id: Current submenu id.
-        """
-        try:
-            stmt = delete(Submenus).where(target_submenu_id == Submenus.id)
-            await session.execute(stmt)
-            await session.commit()
-
-        except Exception as error:
-            return {
-                "status": "Error",
-                "detail": error,
-                "message": "Something went wrong!"
-            }
-
-        return {
-            "status": True,
-            "message": "The submenu has been deleted"
-        }
+    target_submenu_id: Current submenu id.
+    """
+    stmt = delete(Submenus).where(target_submenu_id == Submenus.id)
+    await session.execute(stmt)
+    await session.commit()
+    return ResponseMessage(
+        status=True,
+        message="The submenu has been deleted"
+    )

@@ -1,169 +1,118 @@
 from typing import List, Dict
 from uuid import UUID
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status, APIRouter
 from sqlalchemy import select, insert, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
 from src.models import Dishes
-from src.schemas import CreateDish
-from src.service import ConvertDataToJson
+from src.schemas import RequestDish, ResponseDish, ResponseMessage
+
+router = APIRouter()
+main_query = select(
+    Dishes.id,
+    Dishes.title,
+    Dishes.description,
+    Dishes.price
+).group_by(
+    Dishes.id
+)
+
+col = Dishes.__table__.columns.keys()
 
 
-class DishVehicle:
+@router.get("/", status_code=status.HTTP_200_OK)
+async def get_all_dishes(target_submenu_id: UUID, session: AsyncSession = Depends(get_async_session)
+                         ) -> List[ResponseDish] | List[Dict]:
     """
-    Class which should be router, but something went wrong :(
-
-    Methods make queries and statements to db about dishes.
+    Get dishes list from db and return them.
     """
+    result = await session.execute(main_query.where(Dishes.submenu_id == target_submenu_id))
+    rows = result.fetchall()
+    dishes = []
+    for row in rows:
+        dishes_dict = (dict(zip(col, row)))
+        dishes_dict["price"] = str(dishes_dict["price"])
+        dishes.append(ResponseDish(**dishes_dict))
+    return dishes
 
-    @staticmethod
-    async def get_all_dishes(
-            session: AsyncSession = Depends(get_async_session)) -> List[Dict] | List | Dict:
-        """
-        Get dishes list from db and return them.
-        """
-        try:
-            query = select(
-                Dishes.id,
-                Dishes.title,
-                Dishes.description,
-                Dishes.price
-            ).group_by(
-                Dishes.id
-            )
 
-        except Exception as error:
-            return {
-                "status": "Error",
-                "detail": error,
-                "message": "Something went wrong!"
-            }
+@router.get("/{target_dish_id}", status_code=status.HTTP_200_OK, response_model=ResponseDish)
+async def get_dish_by_id(target_dish_id: str | UUID,
+                         session: AsyncSession = Depends(get_async_session)
+                         ) -> ResponseDish:
+    """
+    Get dish from db and return it.
 
-        result = await session.execute(query)
-        response = await ConvertDataToJson.get_dishes(result)
-        return response
+    target_dish_id: Current dish id.
+    """
+    query = main_query.where(target_dish_id == Dishes.id)
+    result = await session.execute(query)
+    row = result.fetchone()
 
-    @staticmethod
-    async def get_dish_by_id(
-            target_dish_id: str | UUID,
-            session: AsyncSession = Depends(get_async_session)) -> Dict:
-        """
-        Get dish from db and return it.
+    if not row:
+        raise HTTPException(status_code=404, detail='dish not found')
 
-        target_dish_id: Current dish id.
-        """
-        try:
-            query = select(
-                Dishes.id,
-                Dishes.title,
-                Dishes.description,
-                Dishes.price,
-            ).where(target_dish_id == Dishes.id)
+    dish = dict(zip(col, row), **{'price': str(row[-1])})
+    return ResponseDish(**dish)
 
-        except Exception as error:
-            return {
-                "status": "Error",
-                "detail": error,
-                "message": "Something went wrong!"
-            }
 
-        result = await session.execute(query)
-        response = await ConvertDataToJson.get_dish_by_id(result)
+@router.post("/", status_code=status.HTTP_201_CREATED, response_model=ResponseDish)
+async def add_dish(target_submenu_id: str | UUID,
+                   new_dish: RequestDish,
+                   session: AsyncSession = Depends(get_async_session)
+                   ) -> ResponseDish:
+    """
+    Add new dish to db and return it.
 
-        if not response:
-            raise HTTPException(status_code=404, detail='dish not found')
-        return response
+    target_submenu_id: Current submenu id.
+    new_dish: Pydantic schema for request body.
+    """
+    new_dish_dict = dict(new_dish, **{"submenu_id": target_submenu_id})
+    stmt = insert(Dishes).values(**new_dish_dict)
+    query = main_query.where(Dishes.title == new_dish.title)
+    await session.execute(stmt)
+    await session.commit()
+    result = await session.execute(query)
+    row = result.fetchone()
+    dish = dict(zip(col, row), **{'price': str(row[-1])})
+    return ResponseDish(**dish)
 
-    @staticmethod
-    async def add_dish(
-            target_submenu_id: str | UUID,
-            new_dish: CreateDish,
-            session: AsyncSession = Depends(get_async_session)) -> Dict:
-        """
-        Add new dish to db and return it.
 
-        target_submenu_id: Current submenu id.
-        new_dish: Pydantic schema for request body.
-        """
-        new_dish_dict = dict(new_dish)
-        new_dish_dict["submenu_id"] = target_submenu_id
-        try:
-            stmt = insert(Dishes).values(**dict(new_dish_dict))
-            await session.execute(stmt)
-            await session.commit()
+@router.patch("/{target_dish_id}", status_code=status.HTTP_200_OK, response_model=ResponseDish)
+async def update_dish(target_dish_id: str | UUID,
+                      new_dish: RequestDish,
+                      session: AsyncSession = Depends(get_async_session)
+                      ) -> ResponseDish:
+    """
+    Update dish in db and return it.
 
-            query = select(
-                Dishes.id,
-                Dishes.title,
-                Dishes.description,
-                Dishes.price
-            ).where(Dishes.title == new_dish.title)
+    target_dish_id: Current dish id.
+    new_dish: Pydantic schema for request body.
+    """
+    new_dish_dict = dict(new_dish)
+    stmt = update(Dishes).where(target_dish_id == Dishes.id).values(**new_dish_dict)
+    await session.execute(stmt)
+    await session.commit()
 
-        except Exception as error:
-            return {
-                "status": "Error",
-                "detail": error,
-                "message": "Something went wrong!"
-            }
+    new_dish_dict = {'id': target_dish_id, 'price': str(new_dish_dict['price']), **new_dish_dict}
+    return ResponseDish(**new_dish_dict)
 
-        result = await session.execute(query)
-        response = await ConvertDataToJson.get_dish_by_id(result)
-        return response
 
-    @staticmethod
-    async def update_dish(
-            target_dish_id: str | UUID,
-            new_dish: CreateDish,
-            session: AsyncSession = Depends(get_async_session)) -> Dict:
-        """
-        Update dish in db and return it.
+@router.delete("/{target_dish_id}", status_code=status.HTTP_200_OK, response_model=ResponseMessage)
+async def delete_dish(target_dish_id: str | UUID,
+                      session: AsyncSession = Depends(get_async_session)
+                      ) -> ResponseMessage:
+    """
+    Delete dish from db and return message.
 
-        target_dish_id: Current dish id.
-        new_dish: Pydantic schema for request body.
-        """
-        new_dish_dict = dict(new_dish)
-        try:
-            stmt = update(Dishes).where(target_dish_id == Dishes.id).values(**new_dish_dict)
-            await session.execute(stmt)
-            await session.commit()
-
-        except Exception as error:
-            return {
-                "status": "Error",
-                "detail": error,
-                "message": "Something went wrong!"
-            }
-
-        new_dish_dict = {'id': target_dish_id, **new_dish_dict}
-        new_dish_dict['price'] = str(new_dish_dict['price'])
-
-        response = new_dish_dict
-        return response
-
-    @staticmethod
-    async def delete_dish(
-            target_dish_id: str | UUID,
-            session: AsyncSession = Depends(get_async_session)) -> Dict:
-        """
-        Delete dish from db and return message.
-
-        target_dish_id: Current dish id.
-        """
-        try:
-            stmt = delete(Dishes).where(target_dish_id == Dishes.id)
-            await session.execute(stmt)
-            await session.commit()
-
-        except Exception as error:
-            return {
-                "status": "Error",
-                "detail": error,
-                "message": "Something went wrong!"
-            }
-
-        return {
-            "status": True,
-            "message": "The dish has been deleted"
-        }
+    target_dish_id: Current dish id.
+    """
+    stmt = delete(Dishes).where(target_dish_id == Dishes.id)
+    await session.execute(stmt)
+    await session.commit()
+    return ResponseMessage(
+        status=True,
+        message="The dish has been deleted"
+    )

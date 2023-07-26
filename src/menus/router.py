@@ -1,195 +1,123 @@
-from typing import List, Dict
+from typing import List
 from uuid import UUID
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, status, APIRouter
 from sqlalchemy import select, insert, func, distinct, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
 from src.models import Menus, Submenus, Dishes
-from src.schemas import CreateMenuOrSubmenu
-from src.service import ConvertDataToJson
+from src.schemas import BaseRequestModel, ResponseMenu, ResponseMessage
+
+router = APIRouter()
+
+main_query = select(
+    Menus.id,
+    Menus.title,
+    Menus.description,
+    func.count(distinct(Submenus.id)),
+    func.count(Dishes.title)
+).outerjoin(
+    Submenus, Menus.id == Submenus.menu_id
+).outerjoin(
+    Dishes, Submenus.id == Dishes.submenu_id
+).group_by(
+    Menus.id
+)
+
+col = Menus.__table__.columns.keys()
 
 
-class MenuVehicle:
+@router.get("", status_code=status.HTTP_200_OK, response_model=List[ResponseMenu])
+async def get_all_menus(session: AsyncSession = Depends(get_async_session)
+                        ) -> List[ResponseMenu]:
     """
-    Class which should be router, but something went wrong :(
-
-    Methods make queries and statements to db about menus.
+    Get menus list from db and return them.
     """
+    result = await session.execute(main_query)
+    rows = result.fetchall()
+    menus = [ResponseMenu(**(dict(zip(col, row), **{"submenus_count": row[-2], "dishes_count": row[-1]})))
+             for row in rows]
+    return menus
 
-    @staticmethod
-    async def get_all_menus(
-            session: AsyncSession = Depends(get_async_session)) -> List[Dict] | List | Dict:
-        """
-        Get menus list from db and return them.
-        """
-        try:
-            query = select(
-                Menus.id,
-                Menus.title,
-                Menus.description,
-                func.count(distinct(Submenus.id)),
-                func.count(Dishes.title)
-            ).outerjoin(
-                Submenus, Menus.id == Submenus.menu_id
-            ).outerjoin(
-                Dishes, Submenus.id == Dishes.submenu_id
-            ).group_by(
-                Menus.id
-            )
 
-        except Exception as error:
-            return {
-                "status": "Error",
-                "detail": error,
-                "message": "Something went wrong!"
-            }
+@router.get("/{target_menu_id}", status_code=status.HTTP_200_OK, response_model=ResponseMenu)
+async def get_menu_by_id(target_menu_id: str | UUID,
+                         session: AsyncSession = Depends(get_async_session)
+                         ) -> ResponseMenu:
+    """
+    Get menu from db and return it.
 
-        result = await session.execute(query)
-        response = await ConvertDataToJson.get_menus(result)
-        return response
+    target_menu_id: Current menu id.
+    """
+    query = main_query.where(target_menu_id == Menus.id)
+    result = await session.execute(query)
+    row = result.fetchone()
 
-    @staticmethod
-    async def get_menu_by_id(
-            target_menu_id: str | UUID,
-            session: AsyncSession = Depends(get_async_session)) -> Dict:
-        """
-        Get menu from db and return it.
+    if not row:
+        raise HTTPException(status_code=404, detail='menu not found')
 
-        target_menu_id: Current menu id.
-        """
-        try:
-            query = select(
-                Menus.id,
-                Menus.title,
-                Menus.description,
-                func.count(distinct(Submenus.id)),
-                func.count(Dishes.title)
-            ).outerjoin(
-                Submenus, Menus.id == Submenus.menu_id
-            ).outerjoin(
-                Dishes, Submenus.id == Dishes.submenu_id
-            ).group_by(
-                Menus.id
-            ).where(target_menu_id == Menus.id)
+    menu = dict(zip(col, row), **{"submenus_count": row[-2], "dishes_count": row[-1]})
+    return ResponseMenu(**menu)
 
-        except Exception as error:
-            return {
-                "status": "Error",
-                "detail": error,
-                "message": "Something went wrong!"
-            }
 
-        result = await session.execute(query)
-        response = await ConvertDataToJson.get_menu_by_id(result)
+@router.post("", status_code=status.HTTP_201_CREATED, response_model=ResponseMenu)
+async def add_menu(new_menu: BaseRequestModel,
+                   session: AsyncSession = Depends(get_async_session)
+                   ) -> ResponseMenu:
+    """
+    Add new submenu to db and return it.
 
-        if not response:
-            raise HTTPException(status_code=404, detail='menu not found')
-        return response
+    new_menu: Pydantic schema for request body.
+    """
+    stmt = insert(Menus).values(**dict(new_menu))
+    query = main_query.where(Menus.title == new_menu.title)
+    await session.execute(stmt)
+    await session.commit()
+    result = await session.execute(query)
+    row = result.fetchone()
+    menu = dict(zip(col, row), **{"submenus_count": row[-2], "dishes_count": row[-1]})
+    return ResponseMenu(**menu)
 
-    @staticmethod
-    async def add_menu(
-            new_menu: CreateMenuOrSubmenu,
-            session: AsyncSession = Depends(get_async_session)) -> Dict:
-        """
-        Add new submenu to db and return it.
 
-        new_menu: Pydantic schema for request body.
-        """
-        try:
-            stmt = insert(Menus).values(**dict(new_menu))
-            await session.execute(stmt)
-            await session.commit()
+@router.patch("/{target_menu_id}", status_code=status.HTTP_200_OK, response_model=ResponseMenu)
+async def update_menu(target_menu_id: str | UUID,
+                      new_menu: BaseRequestModel,
+                      session: AsyncSession = Depends(get_async_session)
+                      ) -> ResponseMenu:
+    """
+    Update menu in db and return it.
 
-            query = select(
-                Menus.id,
-                Menus.title,
-                Menus.description,
-                func.count(distinct(Submenus.id)),
-                func.count(Dishes.title)
-            ).outerjoin(
-                Submenus, Menus.id == Submenus.menu_id
-            ).outerjoin(
-                Dishes, Submenus.id == Dishes.submenu_id
-            ).group_by(
-                Menus.id
-            ).where(Menus.title == new_menu.title)
+    target_menu_id: Current menu id.
+    new_menu: Pydantic schema for request body.
+    """
+    stmt = update(Menus).where(target_menu_id == Menus.id).values(**dict(new_menu))
+    query = main_query.where(target_menu_id == Menus.id)
+    await session.execute(stmt)
+    await session.commit()
+    result = await session.execute(query)
+    row = result.fetchone()
 
-        except Exception as error:
-            return {
-                "status": "Error",
-                "detail": error,
-                "message": "Something went wrong!"
-            }
+    if not row:
+        raise HTTPException(status_code=404, detail='menu not found')
 
-        result = await session.execute(query)
-        response = await ConvertDataToJson.get_menu_by_id(result)
-        return response
+    menu = dict(zip(col, row), **{"submenus_count": row[-2], "dishes_count": row[-1]})
+    return ResponseMenu(**menu)
 
-    @staticmethod
-    async def update_menu(
-            target_menu_id: str | UUID,
-            new_menu: CreateMenuOrSubmenu,
-            session: AsyncSession = Depends(get_async_session)) -> Dict:
-        """
-        Update menu in db and return it.
 
-        target_menu_id: Current menu id.
-        new_menu: Pydantic schema for request body.
-        """
-        try:
-            stmt = update(Menus).where(target_menu_id == Menus.id).values(**dict(new_menu))
-            await session.execute(stmt)
-            await session.commit()
+@router.delete("/{target_menu_id}", status_code=status.HTTP_200_OK, response_model=ResponseMessage)
+async def delete_menu(target_menu_id: str | UUID,
+                      session: AsyncSession = Depends(get_async_session)
+                      ) -> ResponseMessage:
+    """
+    Delete menu from db and return message.
 
-            query = select(
-                Menus.id,
-                Menus.title,
-                Menus.description,
-                func.count(distinct(Submenus.id)),
-                func.count(Dishes.title)
-            ).outerjoin(
-                Submenus, Menus.id == Submenus.menu_id
-            ).outerjoin(
-                Dishes, Submenus.id == Dishes.submenu_id
-            ).group_by(
-                Menus.id
-            ).where(target_menu_id == Menus.id)
-
-        except Exception as error:
-            return {
-                "status": "Error",
-                "detail": error,
-                "message": "Something went wrong!"
-            }
-
-        result = await session.execute(query)
-        response = await ConvertDataToJson.get_menu_by_id(result)
-        return response
-
-    @staticmethod
-    async def delete_menu(
-            target_menu_id: str | UUID,
-            session: AsyncSession = Depends(get_async_session)) -> Dict:
-        """
-        Delete menu from db and return message.
-
-        target_menu_id: Current menu id.
-        """
-        try:
-            stmt = delete(Menus).where(target_menu_id == Menus.id)
-            await session.execute(stmt)
-            await session.commit()
-
-        except Exception as error:
-            return {
-                "status": "Error",
-                "detail": error,
-                "message": "Something went wrong!"
-            }
-
-        return {
-            "status": True,
-            "message": "The menu has been deleted"
-        }
+    target_menu_id: Current menu id.
+    """
+    stmt = delete(Menus).where(target_menu_id == Menus.id)
+    await session.execute(stmt)
+    await session.commit()
+    return ResponseMessage(
+        status=True,
+        message="The menu has been deleted"
+    )
