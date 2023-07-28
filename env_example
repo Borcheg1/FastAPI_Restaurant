@@ -1,10 +1,10 @@
-DB_HOST=db
+DB_HOST=postgres_db
 DB_PORT=5432
 DB_PASS=your_password
 DB_USER=postgres
 DB_NAME=postgres
 
-TEST_DB_HOST=db
+TEST_DB_HOST=postgres_test_db
 TEST_DB_PORT=5432
 TEST_DB_PASS=your_password
 TEST_DB_USER=postgres
