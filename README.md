@@ -7,7 +7,10 @@
 ### An application that allows you to perform CRUD operations for a chain of menus, submenus and dishes.
 
 # Guide for installing and launching the application
-## First option for local database
+## 1. Option for local database
+
+
+### **1.1 Launch the application**
 
 1. Open a terminal and enter the command
 `git clone https://github.com/Borcheg1/FastAPI_Restaurant.git`
@@ -27,15 +30,32 @@
 5. Install required libraries:
 `pip install -r requirements.txt`
 
-6. Rename the `env_example` file to `.env` in the root folder of the project and change the variables for your database. Including set `DB_HOST=localhost`
+6. Rename the `env_example` file to `.env` in the root folder of the project and change the
+variables for your database. Including set `DB_HOST=localhost`
 
-7. Run the application `uvicorn src.main:app`
+7. Run the application with the command:
+`uvicorn src.main:app`
 
 8. Open a browser and go to `localhost:8000/docs#/`
 
-**Are you ready for the tests!**
+### **1.2 Run tests**
 
-## Second option for docker
+1. Follow steps 1-5 from section [1.1 Launch the application](#11-launch-the-application)
+
+2. Rename the `env_example` file to `.env` in the root folder of the project and change the
+variables for your database. Including set `TEST_DB_HOST=localhost`
+
+3. Run the tests with the command:
+`pytest`
+
+### **1.3 Terminate the application**
+
+1. Stop the application with a keyboard shortcut `Ctrl+C`
+
+
+## 2. Option for docker
+
+### **2.1 Launch the application**
 
 1. Open a terminal and enter the command
 `git clone https://github.com/Borcheg1/FastAPI_Restaurant.git`
@@ -49,6 +69,23 @@
 
 5. Open a browser and go to `localhost:8000/docs#/`
 
-**Are you ready for the tests!**
+### **2.2 Terminate the application**
 
-### Thank you for using my app, you are amazing!
+1. Stop the containers with a keyboard shortcut `Ctrl+C`
+
+2. Remove containers and volumes:
+`docker-compose down --volumes`
+
+### **2.3 Run tests**
+
+1. Follow steps 1-3 from section [2.1 Launch the application](#21-launch-the-application)
+
+2. Enter the command `docker-compose --file docker-compose-test.yml up --build`
+and wait for the containers to be built and the application to be tested
+
+### **2.4 Terminate the tests**
+
+1. Stop the containers with a keyboard shortcut `Ctrl+C`
+
+2. Remove containers and volumes:
+`docker-compose --file docker-compose-test.yml down --volumes`<br><br><br>
