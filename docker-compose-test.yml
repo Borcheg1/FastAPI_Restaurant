@@ -1,29 +1,34 @@
 version: '3.8'
 
 services:
-  app:
+  fastapi_test_app:
+    container_name: fastapi_test_app
     build:
       context: .
       dockerfile: Dockerfile-test
     ports:
       - '8000:8000'
     depends_on:
-      - db
-  db:
+      postgres_test_db:
+        condition: service_healthy
+
+  postgres_test_db:
+    container_name: postgres_test_db
     image: postgres:15.1-alpine
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 5
-    restart: always
     ports:
       - "5432:5432"
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=your_password
       - POSTGRES_DB=postgres
+      - PGUSER=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-U", "postgres", "-d", "postgres"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 80s
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data/
 volumes:
   postgres_data:
