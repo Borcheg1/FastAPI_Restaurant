@@ -22,7 +22,7 @@ main_query = select(
 col = Dishes.__table__.columns.keys()
 
 
-@router.get("/", status_code=status.HTTP_200_OK)
+@router.get("", status_code=status.HTTP_200_OK)
 async def get_all_dishes(target_submenu_id: UUID, session: AsyncSession = Depends(get_async_session)
                          ) -> List[ResponseDish] | List[Dict]:
     """
@@ -58,7 +58,7 @@ async def get_dish_by_id(target_dish_id: str | UUID,
     return ResponseDish(**dish)
 
 
-@router.post("/", status_code=status.HTTP_201_CREATED, response_model=ResponseDish)
+@router.post("", status_code=status.HTTP_201_CREATED, response_model=ResponseDish)
 async def add_dish(target_submenu_id: str | UUID,
                    new_dish: RequestDish,
                    session: AsyncSession = Depends(get_async_session)
@@ -70,8 +70,15 @@ async def add_dish(target_submenu_id: str | UUID,
     new_dish: Pydantic schema for request body.
     """
     new_dish_dict = dict(new_dish, **{"submenu_id": target_submenu_id})
+    query_check_title = select(Dishes).where(new_dish.title == Dishes.title)
     stmt = insert(Dishes).values(**new_dish_dict)
     query = main_query.where(Dishes.title == new_dish.title)
+
+    result_title = await session.execute(query_check_title)
+
+    if result_title.first():
+        raise HTTPException(status_code=409, detail="This title already exists")
+
     await session.execute(stmt)
     await session.commit()
     result = await session.execute(query)
@@ -91,13 +98,27 @@ async def update_dish(target_dish_id: str | UUID,
     target_dish_id: Current dish id.
     new_dish: Pydantic schema for request body.
     """
-    new_dish_dict = dict(new_dish)
-    stmt = update(Dishes).where(target_dish_id == Dishes.id).values(**new_dish_dict)
+    stmt = update(Dishes).where(target_dish_id == Dishes.id).values(**dict(new_dish))
+    query_check_id = select(Dishes).where(target_dish_id == Dishes.id)
+    query_check_title = select(Dishes).where(new_dish.title == Dishes.title)
+    query = main_query.where(target_dish_id == Dishes.id)
+
+    result_check_id = await session.execute(query_check_id)
+
+    if not result_check_id.first():
+        raise HTTPException(status_code=404, detail='dish not found')
+
+    result_title = await session.execute(query_check_title)
+
+    if result_title.first():
+        raise HTTPException(status_code=409, detail="This title already exists")
+
     await session.execute(stmt)
     await session.commit()
-
-    new_dish_dict = {'id': target_dish_id, 'price': str(new_dish_dict['price']), **new_dish_dict}
-    return ResponseDish(**new_dish_dict)
+    result = await session.execute(query)
+    row = result.first()
+    dish = dict(zip(col, row), **{'price': str(row[-1])})
+    return ResponseDish(**dish)
 
 
 @router.delete("/{target_dish_id}", status_code=status.HTTP_200_OK, response_model=ResponseMessage)
@@ -110,8 +131,16 @@ async def delete_dish(target_dish_id: str | UUID,
     target_dish_id: Current dish id.
     """
     stmt = delete(Dishes).where(target_dish_id == Dishes.id)
+    query = select(Dishes).where(target_dish_id == Dishes.id)
+    result = await session.execute(query)
+    row = result.first()
+
+    if not row:
+        raise HTTPException(status_code=404, detail='menu not found')
+
     await session.execute(stmt)
     await session.commit()
+
     return ResponseMessage(
         status=True,
         message="The dish has been deleted"
