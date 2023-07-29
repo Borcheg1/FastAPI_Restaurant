@@ -1,5 +1,4 @@
 import pytest
-from decimal import Decimal
 from pytest_mock import MockerFixture
 from httpx import AsyncClient
 
