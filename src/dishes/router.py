@@ -1,44 +1,28 @@
 from typing import List, Dict
 from uuid import UUID
 
-from fastapi import Depends, HTTPException, status, APIRouter
-from sqlalchemy import select, insert, update, delete
+from fastapi import Depends, status, APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
-from src.models import Dishes
+from src.dishes.service import dish_service
 from src.schemas import RequestDish, ResponseDish, ResponseMessage
 
 router = APIRouter()
-main_query = select(
-    Dishes.id,
-    Dishes.title,
-    Dishes.description,
-    Dishes.price
-).group_by(
-    Dishes.id
-)
-
-col = Dishes.__table__.columns.keys()
 
 
 @router.get("", status_code=status.HTTP_200_OK)
-async def get_all_dishes(target_submenu_id: UUID, session: AsyncSession = Depends(get_async_session)
+async def get_all_dishes(target_submenu_id: UUID,
+                         session: AsyncSession = Depends(get_async_session)
                          ) -> List[ResponseDish] | List[Dict]:
     """
     Get dishes list from db and return them.
     """
-    result = await session.execute(main_query.where(Dishes.submenu_id == target_submenu_id))
-    rows = result.fetchall()
-    dishes = []
-    for row in rows:
-        dishes_dict = (dict(zip(col, row)))
-        dishes_dict["price"] = str(dishes_dict["price"])
-        dishes.append(ResponseDish(**dishes_dict))
-    return dishes
+    return await dish_service.get_all_dishes(target_submenu_id, session)
 
 
-@router.get("/{target_dish_id}", status_code=status.HTTP_200_OK, response_model=ResponseDish)
+@router.get("/{target_dish_id}", status_code=status.HTTP_200_OK,
+            response_model=ResponseDish)
 async def get_dish_by_id(target_dish_id: str | UUID,
                          session: AsyncSession = Depends(get_async_session)
                          ) -> ResponseDish:
@@ -47,18 +31,11 @@ async def get_dish_by_id(target_dish_id: str | UUID,
 
     target_dish_id: Current dish id.
     """
-    query = main_query.where(target_dish_id == Dishes.id)
-    result = await session.execute(query)
-    row = result.fetchone()
-
-    if not row:
-        raise HTTPException(status_code=404, detail='dish not found')
-
-    dish = dict(zip(col, row), **{'price': str(row[-1])})
-    return ResponseDish(**dish)
+    return await dish_service.get_dish_by_id(target_dish_id, session)
 
 
-@router.post("", status_code=status.HTTP_201_CREATED, response_model=ResponseDish)
+@router.post("", status_code=status.HTTP_201_CREATED,
+             response_model=ResponseDish)
 async def add_dish(target_submenu_id: str | UUID,
                    new_dish: RequestDish,
                    session: AsyncSession = Depends(get_async_session)
@@ -69,25 +46,11 @@ async def add_dish(target_submenu_id: str | UUID,
     target_submenu_id: Current submenu id.
     new_dish: Pydantic schema for request body.
     """
-    new_dish_dict = dict(new_dish, **{"submenu_id": target_submenu_id})
-    query_check_title = select(Dishes).where(new_dish.title == Dishes.title)
-    stmt = insert(Dishes).values(**new_dish_dict)
-    query = main_query.where(Dishes.title == new_dish.title)
-
-    result_title = await session.execute(query_check_title)
-
-    if result_title.first():
-        raise HTTPException(status_code=409, detail="This title already exists")
-
-    await session.execute(stmt)
-    await session.commit()
-    result = await session.execute(query)
-    row = result.fetchone()
-    dish = dict(zip(col, row), **{'price': str(row[-1])})
-    return ResponseDish(**dish)
+    return await dish_service.add_dish(target_submenu_id, new_dish, session)
 
 
-@router.patch("/{target_dish_id}", status_code=status.HTTP_200_OK, response_model=ResponseDish)
+@router.patch("/{target_dish_id}", status_code=status.HTTP_200_OK,
+              response_model=ResponseDish)
 async def update_dish(target_dish_id: str | UUID,
                       new_dish: RequestDish,
                       session: AsyncSession = Depends(get_async_session)
@@ -98,50 +61,12 @@ async def update_dish(target_dish_id: str | UUID,
     target_dish_id: Current dish id.
     new_dish: Pydantic schema for request body.
     """
-    stmt = update(Dishes).where(target_dish_id == Dishes.id).values(**dict(new_dish))
-    query_check_id = select(Dishes).where(target_dish_id == Dishes.id)
-    query_check_title = select(Dishes).where(new_dish.title == Dishes.title)
-    query = main_query.where(target_dish_id == Dishes.id)
-
-    result_check_id = await session.execute(query_check_id)
-
-    if not result_check_id.first():
-        raise HTTPException(status_code=404, detail='dish not found')
-
-    result_title = await session.execute(query_check_title)
-
-    if result_title.first():
-        raise HTTPException(status_code=409, detail="This title already exists")
-
-    await session.execute(stmt)
-    await session.commit()
-    result = await session.execute(query)
-    row = result.first()
-    dish = dict(zip(col, row), **{'price': str(row[-1])})
-    return ResponseDish(**dish)
+    return await dish_service.update_dish(target_dish_id, new_dish, session)
 
 
-@router.delete("/{target_dish_id}", status_code=status.HTTP_200_OK, response_model=ResponseMessage)
+@router.delete("/{target_dish_id}", status_code=status.HTTP_200_OK,
+               response_model=ResponseMessage)
 async def delete_dish(target_dish_id: str | UUID,
                       session: AsyncSession = Depends(get_async_session)
                       ) -> ResponseMessage:
-    """
-    Delete dish from db and return message.
-
-    target_dish_id: Current dish id.
-    """
-    stmt = delete(Dishes).where(target_dish_id == Dishes.id)
-    query = select(Dishes).where(target_dish_id == Dishes.id)
-    result = await session.execute(query)
-    row = result.first()
-
-    if not row:
-        raise HTTPException(status_code=404, detail='menu not found')
-
-    await session.execute(stmt)
-    await session.commit()
-
-    return ResponseMessage(
-        status=True,
-        message="The dish has been deleted"
-    )
+    return await dish_service.delete_dish(target_dish_id, session)
