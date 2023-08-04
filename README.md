@@ -24,7 +24,7 @@
 4. Activate the virtual environment:
 
     Linux/macOS: `source env/bin/activate`
-   
+
     Windows: `env\Scripts\activate`
 
 5. Install required libraries:
