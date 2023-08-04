@@ -1,11 +1,11 @@
 from decimal import Decimal
 from uuid import UUID
 
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, Field
 
 
 class BaseRequestModel(BaseModel):
-    title: constr(max_length=80)
+    title: str = Field(max_length=80)
     description: str | None = None
 
 
@@ -29,7 +29,7 @@ class ResponseSubmenu(BaseResponseModel):
 
 
 class ResponseDish(BaseResponseModel):
-    price: Decimal
+    price: str
 
 
 class ResponseMessage(BaseModel):
