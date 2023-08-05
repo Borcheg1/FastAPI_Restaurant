@@ -1,0 +1,1450 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Restaurant API",
+    "version": "1.0.0",
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8000/api/v1",
+      "description": "Dev server"
+    }
+  ],
+  "paths": {
+    "/menus": {
+      "get": {
+        "tags": [
+          "Menu"
+        ],
+        "summary": "Get all menus",
+        "description": "Get a list of all menus",
+        "operationId": "get_all_menus_api_v1_menus_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ResponseMenu"
+                  },
+                  "type": "array"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Menu"
+        ],
+        "summary": "Add menu",
+        "description": "Add a menu to the menu List",
+        "operationId": "add_menu_api_v1_menus_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestMenu"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseMenu"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Item conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/409Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/menus/{target_menu_id}": {
+      "get": {
+        "tags": [
+          "Menu"
+        ],
+        "summary": "Get menu by ID",
+        "description": "Get a specific menu by a specific ID",
+        "operationId": "get_menu_by_id_api_v1_menus__target_menu_id__get",
+        "parameters": [
+          {
+            "name": "target_menu_id",
+            "in": "path",
+            "required": true,
+            "description": "Menu ID you want to get",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Menu Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseMenu"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Menu"
+        ],
+        "summary": "Update menu",
+        "description": "Update a specific menu by a specific id",
+        "operationId": "update_menu_api_v1_menus__target_menu_id__patch",
+        "parameters": [
+          {
+            "name": "target_menu_id",
+            "in": "path",
+            "required": true,
+            "description": "Menu ID you want to patch",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Menu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseRequestModel"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseMenu"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Item conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/409Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Menu"
+        ],
+        "summary": "Delete Menu",
+        "description": "Delete a specific menu by a specific id",
+        "operationId": "delete_menu_api_v1_menus__target_menu_id__delete",
+        "parameters": [
+          {
+            "name": "target_menu_id",
+            "in": "path",
+            "required": true,
+            "description": "Menu ID you want to delete",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Menu Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/menus/{target_menu_id}/submenus": {
+      "get": {
+        "tags": [
+          "Submenu"
+        ],
+        "summary": "Get all submenus",
+        "description": "Get a list of all submenus",
+        "operationId": "get_all_submenus_api_v1_menus__target_menu_id__submenus_get",
+        "parameters": [
+          {
+            "name": "target_menu_id",
+            "in": "path",
+            "required": true,
+            "description": "Menu ID whose submenus you want to get",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Menu Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResponseSubmenu"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Submenu"
+        ],
+        "summary": "Add submenu",
+        "description": "Add a submenu to the submenus list",
+        "operationId": "add_submenu_api_v1_menus__target_menu_id__submenus_post",
+        "parameters": [
+          {
+            "name": "target_menu_id",
+            "in": "path",
+            "required": true,
+            "description": "Menu ID that the submenu will belong to",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Menu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestSubmenu"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSubmenu"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Item conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/409Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/menus/{target_menu_id}/submenus/{target_submenu_id}": {
+      "get": {
+        "tags": [
+          "Submenu"
+        ],
+        "summary": "Get submenu by ID",
+        "description": "Get a specific submenu by a specific ID",
+        "operationId": "get_submenu_by_id_api_v1_menus__target_menu_id__submenus__target_submenu_id__get",
+        "parameters": [
+          {
+            "name": "target_menu_id",
+            "in": "path",
+            "required": true,
+            "description": "Menu ID that the submenu will belong to",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Menu Id"
+            }
+          },
+          {
+            "name": "target_submenu_id",
+            "in": "path",
+            "required": true,
+            "description": "Submenu ID you want to get",
+            "example": "bf1ee5a5-d83b-4c9e-8844-529a974fc317",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Submenu Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSubmenu"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Submenu"
+        ],
+        "summary": "Update Submenu",
+        "description": "Update a specific submenu by a specific id",
+        "operationId": "update_submenu_api_v1_menus__target_menu_id__submenus__target_submenu_id__patch",
+        "parameters": [
+          {
+            "name": "target_menu_id",
+            "in": "path",
+            "required": true,
+            "description": "Menu ID that the submenu will belong to",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Menu Id"
+            }
+          },
+          {
+            "name": "target_submenu_id",
+            "in": "path",
+            "required": true,
+            "description": "Submenu ID you want to patch",
+            "example": "bf1ee5a5-d83b-4c9e-8844-529a974fc317",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Submenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestSubmenu"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseSubmenu"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Item conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/409Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Submenu"
+        ],
+        "summary": "Delete Submenu",
+        "description": "Delete a specific submenu by a specific id",
+        "operationId": "delete_submenu_api_v1_menus__target_menu_id__submenus__target_submenu_id__delete",
+        "parameters": [
+          {
+            "name": "target_menu_id",
+            "in": "path",
+            "required": true,
+            "description": "Menu ID that the submenu will belong to",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Menu Id"
+            }
+          },
+          {
+            "name": "target_submenu_id",
+            "in": "path",
+            "required": true,
+            "description": "Submenu ID you want to delete",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Submenu Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes": {
+      "get": {
+        "tags": [
+          "Dish"
+        ],
+        "summary": "Get all dishes",
+        "description": "Get a list of all dishes",
+        "operationId": "get_all_dishes_api_v1_menus__menu_id__submenus__target_submenu_id__dishes_get",
+        "parameters": [
+          {
+            "name": "target_menu_id",
+            "in": "path",
+            "required": true,
+            "description": "Menu ID that the submenu will belong to",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Menu Id"
+            }
+          },
+          {
+            "name": "target_submenu_id",
+            "in": "path",
+            "required": true,
+            "description": "Submenu ID that the dish will belong to",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Submenu Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResponseDish"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Dish"
+        ],
+        "summary": "Add dish",
+        "description": "Add a dish to the dishes list",
+        "operationId": "add_dish_api_v1_menus__menu_id__submenus__target_submenu_id__dishes_post",
+        "parameters": [
+          {
+            "name": "target_menu_id",
+            "in": "path",
+            "required": true,
+            "description": "Menu ID that the submenu will belong to",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Menu Id"
+            }
+          },
+          {
+            "name": "target_submenu_id",
+            "in": "path",
+            "required": true,
+            "description": "Submenu ID that the dish will belong to",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Submenu Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestDish"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDish"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Item conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/409Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/menus/{target_menu_id}/submenus/{target_submenu_id}/dishes/{target_dish_id}": {
+      "get": {
+        "tags": [
+          "Dish"
+        ],
+        "summary": "Get dish by ID",
+        "description": "Get a specific dish by a specific ID",
+        "operationId": "get_dish_by_id_api_v1_menus__menu_id__submenus__target_submenu_id__dishes__target_dish_id__get",
+        "parameters": [
+          {
+            "name": "target_menu_id",
+            "in": "path",
+            "required": true,
+            "description": "Menu ID that the submenu will belong to",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Menu Id"
+            }
+          },
+          {
+            "name": "target_submenu_id",
+            "in": "path",
+            "required": true,
+            "description": "Submenu ID that the dish will belong to",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Submenu Id"
+            }
+          },
+          {
+            "name": "target_dish_id",
+            "in": "path",
+            "required": true,
+            "description": "Dish ID you want to get",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Dish Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDish"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Dish"
+        ],
+        "summary": "Update dish",
+        "description": "Update a specific dish by a specific id",
+        "operationId": "update_dish_api_v1_menus__menu_id__submenus__target_submenu_id__dishes__target_dish_id__patch",
+        "parameters": [
+          {
+            "name": "target_menu_id",
+            "in": "path",
+            "required": true,
+            "description": "Menu ID that the submenu will belong to",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Menu Id"
+            }
+          },
+          {
+            "name": "target_submenu_id",
+            "in": "path",
+            "required": true,
+            "description": "Submenu ID that the dish will belong to",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Submenu Id"
+            }
+          },
+          {
+            "name": "target_dish_id",
+            "in": "path",
+            "required": true,
+            "description": "Dish ID you want to update",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Dish Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestDish"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseDish"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Item conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/409Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Dish"
+        ],
+        "summary": "Delete dish",
+        "description": "Delete a specific dish by a specific id",
+        "operationId": "delete_dish_api_v1_menus__menu_id__submenus__target_submenu_id__dishes__target_dish_id__delete",
+        "parameters": [
+          {
+            "name": "target_menu_id",
+            "in": "path",
+            "required": true,
+            "description": "Menu ID that the submenu will belong to",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Menu Id"
+            }
+          },
+          {
+            "name": "target_submenu_id",
+            "in": "path",
+            "required": true,
+            "description": "Submenu ID that the dish will belong to",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Submenu Id"
+            }
+          },
+          {
+            "name": "target_dish_id",
+            "in": "path",
+            "required": true,
+            "description": "Dish ID you want to update",
+            "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Target Dish Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseMessage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/404Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RequestMenu": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseRequestModel"
+          }
+        ],
+        "title": "RequestMenu"
+      },
+      "RequestSubmenu": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BaseRequestModel"
+          }
+        ],
+        "title": "RequestSubmenu"
+      },
+      "RequestDish": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 80,
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "title": "Description"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Price"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "price"
+        ],
+        "title": "RequestDish"
+      },
+      "ResponseDish": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "title": "Description"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Price"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "description",
+          "price"
+        ],
+        "title": "ResponseDish"
+      },
+      "ResponseMenu": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "title": "Description"
+          },
+          "submenus_count": {
+            "type": "integer",
+            "title": "Submenus Count"
+          },
+          "dishes_count": {
+            "type": "integer",
+            "title": "Dishes Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "description",
+          "submenus_count",
+          "dishes_count"
+        ],
+        "title": "ResponseMenu"
+      },
+      "ResponseMessage": {
+        "properties": {
+          "status": {
+            "type": "boolean",
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "example": "The item has been deleted"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "message"
+        ],
+        "title": "ResponseMessage"
+      },
+      "ResponseSubmenu": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "title": "Description"
+          },
+          "dishes_count": {
+            "type": "integer",
+            "title": "Dishes Count"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "description",
+          "dishes_count"
+        ],
+        "title": "ResponseSubmenu"
+      },
+      "BaseRequestModel": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "maxLength": 80,
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title"
+        ]
+      },
+      "404Error": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "detail": {
+            "type": "string",
+            "example": "Item not found"
+          }
+        }
+      },
+      "409Error": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "detail": {
+            "type": "string",
+            "example": "This title already exists"
+          }
+        }
+      },
+      "422Error": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ]
+      },
+      "DefaultError": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "detail": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
