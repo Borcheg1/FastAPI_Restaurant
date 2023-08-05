@@ -15,3 +15,6 @@ TEST_DB_PORT = os.environ.get('TEST_DB_PORT')
 TEST_DB_PASS = os.environ.get('TEST_DB_PASS')
 TEST_DB_USER = os.environ.get('TEST_DB_USER')
 TEST_DB_NAME = os.environ.get('TEST_DB_NAME')
+
+REDIS_HOST = os.environ.get('REDIS_HOST')
+REDIS_PORT = os.environ.get('REDIS_PORT')
