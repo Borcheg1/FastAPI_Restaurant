@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   fastapi_test_app:
-    container_name: fastapi_test_app
+    container_name: fastapi_app
     build:
       context: .
       dockerfile: Dockerfile
@@ -13,22 +13,27 @@ services:
         condition: service_healthy
 
   postgres_db:
-    container_name: postgres_test_db
+    container_name: postgres_db
     image: postgres:15.1-alpine
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=your_password
-      - POSTGRES_DB=postgres
-      - PGUSER=postgres
+      POSTGRES_USER: "${DB_USER}"
+      POSTGRES_PASSWORD: "${DB_PASS}"
+      POSTGRES_DB: db
+      PGUSER: "${DB_PGUSER}"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready", "-U", "postgres", "-d", "postgres"]
+      test: ["CMD-SHELL", "psql -U ${DB_PGUSER}", "pg_isready", "-U", "${DB_USER}", "-d", "db"]
       interval: 10s
       timeout: 30s
       retries: 5
       start_period: 80s
     volumes:
       - postgres_data:/var/lib/postgresql/data/
+
+  redis:
+    container_name: redis_db
+    image: redis:alpine
+
 volumes:
   postgres_data:
