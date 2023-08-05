@@ -1,9 +1,10 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database import get_async_session
+from src.database import get_async_session, get_redis_client
 from src.schemas import BaseRequestModel, ResponseMenu, ResponseMessage
 from src.service.menu_service import MenuService
 
@@ -16,9 +17,10 @@ menu_service = MenuService()
 )
 async def get_all_menus(
     session: AsyncSession = Depends(get_async_session),
+    redis_client: Redis = Depends(get_redis_client),
 ) -> list[ResponseMenu]:
     """Get menus list from db and return them."""
-    return await menu_service.get_all_menus(session)
+    return await menu_service.get_all_menus(session, redis_client)
 
 
 @router.get(
@@ -26,13 +28,17 @@ async def get_all_menus(
     response_model=ResponseMenu
 )
 async def get_menu_by_id(
-    target_menu_id: UUID, session: AsyncSession = Depends(get_async_session)
+    target_menu_id: UUID,
+    session: AsyncSession = Depends(get_async_session),
+    redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseMenu:
     """Get menu from db and return it.
 
     target_menu_id: Current menu id.
     """
-    return await menu_service.get_menu_by_id(session, target_menu_id)
+    return await menu_service.get_menu_by_id(
+        session, redis_client, target_menu_id
+    )
 
 
 @router.post(
@@ -40,13 +46,14 @@ async def get_menu_by_id(
 )
 async def add_menu(
     new_menu: BaseRequestModel,
-    session: AsyncSession = Depends(get_async_session)
+    session: AsyncSession = Depends(get_async_session),
+    redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseMenu:
     """Add new submenu to db and return it.
 
     new_menu: Pydantic schema for request body.
     """
-    return await menu_service.add_menu(session, new_menu)
+    return await menu_service.add_menu(session, redis_client, new_menu)
 
 
 @router.patch(
@@ -57,13 +64,16 @@ async def update_menu(
     target_menu_id: UUID,
     new_menu: BaseRequestModel,
     session: AsyncSession = Depends(get_async_session),
+    redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseMenu:
     """Update menu in db and return it.
 
     target_menu_id: Current menu id.
     new_menu: Pydantic schema for request body.
     """
-    return await menu_service.update_menu(session, target_menu_id, new_menu)
+    return await menu_service.update_menu(
+        session, redis_client, target_menu_id, new_menu
+    )
 
 
 @router.delete(
@@ -71,10 +81,12 @@ async def update_menu(
     response_model=ResponseMessage
 )
 async def delete_menu(
-    target_menu_id: UUID, session: AsyncSession = Depends(get_async_session)
+    target_menu_id: UUID,
+    session: AsyncSession = Depends(get_async_session),
+    redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseMessage:
     """Delete menu from db and return message.
 
     target_menu_id: Current menu id.
     """
-    return await menu_service.delete_menu(session, target_menu_id)
+    return await menu_service.delete_menu(session, redis_client, target_menu_id)

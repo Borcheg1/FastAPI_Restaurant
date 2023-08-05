@@ -1,9 +1,10 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.database import get_async_session
+from src.database import get_async_session, get_redis_client
 from src.schemas import RequestDish, ResponseDish, ResponseMessage
 from src.service.dish_service import DishService
 
@@ -16,10 +17,11 @@ async def get_all_dishes(
     target_menu_id: UUID,
     target_submenu_id: UUID,
     session: AsyncSession = Depends(get_async_session),
-) -> list[ResponseDish] | list:
+    redis_client: Redis = Depends(get_redis_client),
+) -> list[ResponseDish]:
     """Get dishes list from db and return them."""
     return await dish_service.get_all_dishes(
-        session, target_menu_id, target_submenu_id
+        session, redis_client, target_menu_id, target_submenu_id
     )
 
 
@@ -32,13 +34,14 @@ async def get_dish_by_id(
     target_submenu_id: UUID,
     target_dish_id: UUID,
     session: AsyncSession = Depends(get_async_session),
+    redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseDish:
     """Get dish from db and return it.
 
     target_dish_id: Current dish id.
     """
     return await dish_service.get_dish_by_id(
-        session, target_menu_id, target_submenu_id, target_dish_id
+        session, redis_client, target_menu_id, target_submenu_id, target_dish_id
     )
 
 
@@ -49,6 +52,7 @@ async def add_dish(
     target_submenu_id: UUID,
     new_dish: RequestDish,
     session: AsyncSession = Depends(get_async_session),
+    redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseDish:
     """Add new dish to db and return it.
 
@@ -56,7 +60,7 @@ async def add_dish(
     new_dish: Pydantic schema for request body.
     """
     return await dish_service.add_dish(
-        session, target_menu_id, target_submenu_id, new_dish
+        session, redis_client, target_menu_id, target_submenu_id, new_dish
     )
 
 
@@ -70,6 +74,7 @@ async def update_dish(
     target_dish_id: UUID,
     new_dish: RequestDish,
     session: AsyncSession = Depends(get_async_session),
+    redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseDish:
     """Update dish in db and return it.
 
@@ -77,7 +82,8 @@ async def update_dish(
     new_dish: Pydantic schema for request body.
     """
     return await dish_service.update_dish(
-        session, target_menu_id, target_submenu_id, target_dish_id, new_dish
+        session, redis_client, target_menu_id, target_submenu_id,
+        target_dish_id, new_dish
     )
 
 
@@ -90,7 +96,8 @@ async def delete_dish(
     target_submenu_id: UUID,
     target_dish_id: UUID,
     session: AsyncSession = Depends(get_async_session),
+    redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseMessage:
     return await dish_service.delete_dish(
-        session, target_menu_id, target_submenu_id, target_dish_id
+        session, redis_client, target_menu_id, target_submenu_id, target_dish_id
     )
