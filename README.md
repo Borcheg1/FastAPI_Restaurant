@@ -30,20 +30,25 @@
 5. Install required libraries:
 `pip install -r requirements.txt`
 
-6. Rename the `env_example` file to `.env` in the root folder of the project and change the
-variables for your database. Including set `DB_HOST=localhost`
+6. Install pre-commit hooks:
+`pre-commit install`
 
-7. Run the application with the command:
+7. Rename the `env_example` file to `.env` in the root folder of the project and change the
+variables for your database. Including set `DB_HOST=localhost` and `REDIS_HOST=localhost`
+
+8. If you want to manually run all pre-commit hooks on a repository, run `pre-commit run --all-files`
+
+9. Run the application with the command:
 `uvicorn src.main:app`
 
-8. Open a browser and go to `localhost:8000/docs#/`
+10. Open a browser and go to `localhost:8000/docs#/`
 
 ### **1.2 Run tests**
 
 1. Follow steps 1-5 from section [1.1 Launch the application](#11-launch-the-application)
 
 2. Rename the `env_example` file to `.env` in the root folder of the project and change the
-variables for your database. Including set `TEST_DB_HOST=localhost`
+variables for your database. Including set `TEST_DB_HOST=localhost` and `REDIS_HOST=localhost`
 
 3. Run the tests with the command:
 `pytest`
@@ -65,9 +70,11 @@ variables for your database. Including set `TEST_DB_HOST=localhost`
 
 3. Rename the `env_example` file to `.env` in the root folder of the project
 
-4. Enter the command `docker-compose up --build` and wait for the containers to build
+4. If you want to run all pre-commit hooks when container is building, then uncommenting commands in Dockerfile
 
-5. Open a browser and go to `localhost:8000/docs#/`
+5. Enter the command `docker-compose up --build` and wait for the containers to build
+
+6. Open a browser and go to `localhost:8000/docs#/`
 
 ### **2.2 Terminate the application**
 
