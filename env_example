@@ -3,9 +3,14 @@ DB_PORT=5432
 DB_PASS=your_password
 DB_USER=postgres
 DB_NAME=postgres
+DB_PGUSER=postgres
 
 TEST_DB_HOST=postgres_test_db
 TEST_DB_PORT=5432
 TEST_DB_PASS=your_password
 TEST_DB_USER=postgres
 TEST_DB_NAME=postgres
+TEST_DB_PGUSER=postgres
+
+REDIS_HOST=redis
+REDIS_PORT=6379
