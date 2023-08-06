@@ -19,3 +19,6 @@ def custom_openapi():
 async def init_db() -> None:
     """Initial Redis and recreate tables in db after app launch."""
     await create_tables()
+
+
+app.openapi = custom_openapi
