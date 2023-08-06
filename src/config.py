@@ -18,3 +18,6 @@ TEST_DB_NAME = os.environ.get('TEST_DB_NAME')
 
 REDIS_HOST = os.environ.get('REDIS_HOST')
 REDIS_PORT = os.environ.get('REDIS_PORT')
+
+TEST_REDIS_HOST = os.environ.get('TEST_REDIS_HOST')
+TEST_REDIS_PORT = os.environ.get('TEST_REDIS_PORT')
