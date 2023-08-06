@@ -1,4 +1,5 @@
 import json
+from typing import Any
 
 from fastapi import FastAPI
 
@@ -10,7 +11,7 @@ app = FastAPI(title='Restaurant API')
 app.include_router(main_router)
 
 
-def custom_openapi():
+def custom_openapi() -> dict[str, Any]:
     with open('openapi.json') as file:
         return json.load(file)
 
