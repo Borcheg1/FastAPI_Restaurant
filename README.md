@@ -71,7 +71,7 @@ variables for your database. Including set `TEST_DB_HOST=localhost` and `REDIS_H
 
 3. Rename the `env_example` file to `.env` in the root folder of the project
 
-4. If you want to run all pre-commit hooks when container is building, then uncommenting commands in Dockerfile
+4. If you want to run all pre-commit hooks when container is building, then uncommenting commands in `Dockerfile`
 
 5. Enter the command `docker-compose up --build` and wait for the containers to build
 
