@@ -16,7 +16,7 @@ from src.config import (
     TEST_REDIS_HOST,
     TEST_REDIS_PORT,
 )
-from src.database import Base, get_async_session
+from src.database import Base, get_async_session, get_redis_client
 from src.main import app
 
 path = (
@@ -35,7 +35,13 @@ async def override_get_async_session() -> AsyncGenerator[AsyncSession, None]:
         yield session
 
 
+async def override_get_redis_client() -> AsyncGenerator[Redis, None]:
+    async with redis_test as client:
+        yield client
+
+
 app.dependency_overrides[get_async_session] = override_get_async_session
+app.dependency_overrides[get_redis_client] = override_get_redis_client
 
 
 @pytest.fixture(scope='session')
@@ -52,7 +58,13 @@ async def async_client() -> AsyncGenerator[AsyncClient, None]:
 
 
 @pytest_asyncio.fixture(scope='module', autouse=True)
-async def prepare_tables():
+async def prepare_tables() -> AsyncGenerator[AsyncClient, Redis]:
+    async with redis_test as redis:
+        await redis.flushdb()
+    async with test_engine.begin() as con:
+        await con.run_sync(Base.metadata.drop_all)
+        await con.run_sync(Base.metadata.create_all)
+    yield
     async with redis_test as redis:
         await redis.flushdb()
     async with test_engine.begin() as con:
