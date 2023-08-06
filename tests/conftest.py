@@ -4,6 +4,7 @@ from typing import AsyncGenerator, Generator
 import pytest
 import pytest_asyncio
 from httpx import AsyncClient
+from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from src.config import (
@@ -12,6 +13,8 @@ from src.config import (
     TEST_DB_PASS,
     TEST_DB_PORT,
     TEST_DB_USER,
+    TEST_REDIS_HOST,
+    TEST_REDIS_PORT,
 )
 from src.database import Base, get_async_session
 from src.main import app
@@ -21,6 +24,7 @@ path = (
     f'{TEST_DB_USER}:{TEST_DB_PASS}@{TEST_DB_HOST}:{TEST_DB_PORT}/{TEST_DB_NAME}'
 )
 TEST_DATABASE_URL = path
+redis_test = Redis(host=TEST_REDIS_HOST, port=TEST_REDIS_PORT, db=0)
 
 test_engine = create_async_engine(TEST_DATABASE_URL)
 test_async_session = async_sessionmaker(test_engine)
@@ -49,6 +53,8 @@ async def async_client() -> AsyncGenerator[AsyncClient, None]:
 
 @pytest_asyncio.fixture(scope='module', autouse=True)
 async def prepare_tables():
+    async with redis_test as redis:
+        await redis.flushdb()
     async with test_engine.begin() as con:
         await con.run_sync(Base.metadata.drop_all)
         await con.run_sync(Base.metadata.create_all)
