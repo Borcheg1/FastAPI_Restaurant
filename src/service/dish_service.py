@@ -3,8 +3,8 @@ from uuid import UUID
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.cache.redis_cache import Cache
 from src.repository.dish_repository import DishRepository
-from src.repository.redis_cache import Cache
 from src.schemas import RequestDish, ResponseDish, ResponseMessage
 
 
