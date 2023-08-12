@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, BackgroundTasks, Depends, status
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,12 +17,13 @@ submenu_service = SubmenuService()
 )
 async def get_all_submenus(
     target_menu_id: UUID,
+    background_tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> list[ResponseSubmenu]:
     """Get dishes list from db and return them."""
     return await submenu_service.get_all_submenus(
-        session, redis_client, target_menu_id
+        session, redis_client, target_menu_id, background_tasks
     )
 
 
@@ -34,6 +35,7 @@ async def get_all_submenus(
 async def get_submenu_by_id(
     target_menu_id: UUID,
     target_submenu_id: UUID,
+    background_tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseSubmenu:
@@ -42,7 +44,7 @@ async def get_submenu_by_id(
     target_submenu_id: Current submenu id.
     """
     return await submenu_service.get_submenu_by_id(
-        session, redis_client, target_menu_id, target_submenu_id
+        session, redis_client, target_menu_id, target_submenu_id, background_tasks
     )
 
 
@@ -52,6 +54,7 @@ async def get_submenu_by_id(
 async def add_submenu(
     target_menu_id: UUID,
     new_submenu: BaseRequestModel,
+    background_tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseSubmenu:
@@ -61,7 +64,7 @@ async def add_submenu(
     new_submenu: Pydantic schema for request body.
     """
     return await submenu_service.add_submenu(
-        session, redis_client, target_menu_id, new_submenu
+        session, redis_client, target_menu_id, new_submenu, background_tasks
     )
 
 
@@ -74,6 +77,7 @@ async def update_submenu(
     target_menu_id: UUID,
     target_submenu_id: UUID,
     new_submenu: BaseRequestModel,
+    background_tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseSubmenu:
@@ -83,7 +87,7 @@ async def update_submenu(
     new_submenu: Pydantic schema for request body.
     """
     return await submenu_service.update_submenu(
-        session, redis_client, target_menu_id, target_submenu_id, new_submenu
+        session, redis_client, target_menu_id, target_submenu_id, new_submenu, background_tasks
     )
 
 
@@ -95,6 +99,7 @@ async def update_submenu(
 async def delete_submenu(
     target_menu_id: UUID,
     target_submenu_id: UUID,
+    background_tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseMessage:
@@ -103,5 +108,5 @@ async def delete_submenu(
     target_submenu_id: Current submenu id.
     """
     return await submenu_service.delete_submenu(
-        session, redis_client, target_menu_id, target_submenu_id
+        session, redis_client, target_menu_id, target_submenu_id, background_tasks
     )

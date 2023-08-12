@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, BackgroundTasks, Depends, status
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,12 +16,13 @@ dish_service = DishService()
 async def get_all_dishes(
     target_menu_id: UUID,
     target_submenu_id: UUID,
+    background_tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> list[ResponseDish]:
     """Get dishes list from db and return them."""
     return await dish_service.get_all_dishes(
-        session, redis_client, target_menu_id, target_submenu_id
+        session, redis_client, target_menu_id, target_submenu_id, background_tasks
     )
 
 
@@ -33,6 +34,7 @@ async def get_dish_by_id(
     target_menu_id: UUID,
     target_submenu_id: UUID,
     target_dish_id: UUID,
+    background_tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseDish:
@@ -41,7 +43,7 @@ async def get_dish_by_id(
     target_dish_id: Current dish id.
     """
     return await dish_service.get_dish_by_id(
-        session, redis_client, target_menu_id, target_submenu_id, target_dish_id
+        session, redis_client, target_menu_id, target_submenu_id, target_dish_id, background_tasks
     )
 
 
@@ -51,6 +53,7 @@ async def add_dish(
     target_menu_id: UUID,
     target_submenu_id: UUID,
     new_dish: RequestDish,
+    background_tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseDish:
@@ -60,7 +63,7 @@ async def add_dish(
     new_dish: Pydantic schema for request body.
     """
     return await dish_service.add_dish(
-        session, redis_client, target_menu_id, target_submenu_id, new_dish
+        session, redis_client, target_menu_id, target_submenu_id, new_dish, background_tasks
     )
 
 
@@ -73,6 +76,7 @@ async def update_dish(
     target_submenu_id: UUID,
     target_dish_id: UUID,
     new_dish: RequestDish,
+    background_tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseDish:
@@ -83,7 +87,7 @@ async def update_dish(
     """
     return await dish_service.update_dish(
         session, redis_client, target_menu_id, target_submenu_id,
-        target_dish_id, new_dish
+        target_dish_id, new_dish, background_tasks
     )
 
 
@@ -95,9 +99,10 @@ async def delete_dish(
     target_menu_id: UUID,
     target_submenu_id: UUID,
     target_dish_id: UUID,
+    background_tasks: BackgroundTasks,
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseMessage:
     return await dish_service.delete_dish(
-        session, redis_client, target_menu_id, target_submenu_id, target_dish_id
+        session, redis_client, target_menu_id, target_submenu_id, target_dish_id, background_tasks
     )
