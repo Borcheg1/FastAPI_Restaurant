@@ -19,18 +19,19 @@ class Cache:
         data = pickle.dumps(value)
         await client.set(key, data, ex=self.expired_time)
 
-    @staticmethod
-    async def delete(client: Redis, key: str) -> None:
+    async def delete(self, client: Redis, key: str) -> None:
+        await self.multiply_delete(client, ['full', 'db_data'])
         await client.delete(key)
 
-    @staticmethod
-    async def cascade_delete(client: Redis, pattern: str) -> None:
-        await client.delete('all')
+    async def cascade_delete(self, client: Redis, pattern: str) -> None:
+        await self.multiply_delete(client, ['all', 'full', 'db_data'])
         async for key in client.scan_iter(f'{pattern}*'):
             await client.delete(key)
 
     @staticmethod
     async def multiply_delete(client: Redis, keys: list[str]) -> None:
+        await client.delete('full')
+        await client.delete('db_data')
         for key in keys:
             if await client.exists(key):
                 await client.delete(key)
