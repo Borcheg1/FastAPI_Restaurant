@@ -10,7 +10,7 @@ router = APIRouter()
 full_menu_service = FullMenuService()
 
 
-@router.get('/get', status_code=status.HTTP_200_OK)
+@router.get('', status_code=status.HTTP_200_OK)
 async def get_full_menu(
     background_task: BackgroundTasks,
     session: AsyncSession = Depends(get_async_session),
