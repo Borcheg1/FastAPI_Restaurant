@@ -174,6 +174,7 @@ async def test_patch_dish(async_client: AsyncClient):
         f"{path}/{data['dish1']['id']}", json=data['patch_dish1']
     )
 
+    assert response.status_code == 200
     assert response.json()['id'] == data['dish1']['id']
     assert response.json()['title'] == data['patch_dish1']['title']
     assert response.json()['description'] == data['patch_dish1']['description']
@@ -183,6 +184,7 @@ async def test_patch_dish(async_client: AsyncClient):
         f"{path}/{data['dish2']['id']}", json=data['patch_dish2']
     )
 
+    assert response.status_code == 200
     assert response2.json()['id'] == data['dish2']['id']
     assert response2.json()['title'] == data['patch_dish2']['title']
     assert response2.json()['description'] == data['patch_dish2']['description']
