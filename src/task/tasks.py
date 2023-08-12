@@ -133,7 +133,7 @@ async def _get_data_from_db() -> Sequence[Row[tuple[Any]]]:
 async def compare_data() -> None:
     sql_data = await _get_data_from_db()
 
-    excel_data_list, excel_data_dict = await _read_excel_file('C:/Users/Dmitrii/PycharmProjects/FastAPI_Restaurant/admin/Menu.xlsx')
+    excel_data_list, excel_data_dict = await _read_excel_file('admin/Menu.xlsx')
 
     excel_data_list.sort(key=lambda x: x[1])
 
@@ -174,7 +174,3 @@ async def _delete_none(excel_data_dict: dict) -> dict[str, list]:
             excel_data_dict_wo_none[key].append(item_tuple)
 
     return excel_data_dict_wo_none
-
-
-data = asyncio.run(compare_data())
-print(data)
