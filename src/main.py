@@ -3,7 +3,7 @@ from typing import Any
 
 from fastapi import FastAPI
 
-from src.database import create_tables
+from src.database import create_tables, delete_cache
 from src.router import main_router
 
 app = FastAPI(title='Restaurant API')
@@ -18,8 +18,9 @@ def custom_openapi() -> dict[str, Any]:
 
 @app.on_event('startup')
 async def init_db() -> None:
-    """Initial Redis and recreate tables in db after app launch."""
+    """Recreate tables in db and clear all cache in redis after app launch"""
     await create_tables()
+    await delete_cache()
 
 
 app.openapi = custom_openapi
