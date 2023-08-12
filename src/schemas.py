@@ -35,3 +35,24 @@ class ResponseDish(BaseResponseModel):
 class ResponseMessage(BaseModel):
     status: bool
     message: str
+
+
+class ResponseFullDish(BaseModel):
+    id: UUID
+    title: str
+    description: str | None
+    price: str
+
+
+class ResponseFullSubmenu(BaseModel):
+    id: UUID
+    title: str
+    description: str | None
+    dishes_list: list[ResponseFullDish] | list
+
+
+class ResponseFullMenu(BaseModel):
+    id: UUID
+    title: str
+    description: str | None
+    submenus_list: list[ResponseFullSubmenu] | list
