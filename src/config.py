@@ -21,3 +21,13 @@ REDIS_PORT = os.environ.get('REDIS_PORT')
 
 TEST_REDIS_HOST = os.environ.get('TEST_REDIS_HOST')
 TEST_REDIS_PORT = os.environ.get('TEST_REDIS_PORT')
+
+BROKER_USER = os.environ.get('BROKER_USER')
+BROKER_PASS = os.environ.get('BROKER_PASS')
+BROKER_HOST = os.environ.get('BROKER_HOST')
+BROKER_PORT = os.environ.get('BROKER_PORT')
+
+BACKEND_USER = os.environ.get('BACKEND_USER')
+BACKEND_PASS = os.environ.get('BACKEND_PASS')
+BACKEND_HOST = os.environ.get('BACKEND_HOST')
+BACKEND_PORT = os.environ.get('BACKEND_PORT')
