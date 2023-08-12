@@ -20,7 +20,7 @@
           "Menu"
         ],
         "summary": "Get all menus",
-        "description": "Get a list of all menus",
+        "description": "Get list of all menus",
         "operationId": "get_all_menus_api_v1_menus_get",
         "responses": {
           "200": {
@@ -32,16 +32,6 @@
                     "$ref": "#/components/schemas/ResponseMenu"
                   },
                   "type": "array"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/422Error"
                 }
               }
             }
@@ -142,7 +132,7 @@
             "name": "target_menu_id",
             "in": "path",
             "required": true,
-            "description": "Menu ID you want to get",
+            "description": "Menu ID you want to get<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -206,7 +196,7 @@
             "name": "target_menu_id",
             "in": "path",
             "required": true,
-            "description": "Menu ID you want to patch",
+            "description": "Menu ID you want to patch<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -290,7 +280,7 @@
             "name": "target_menu_id",
             "in": "path",
             "required": true,
-            "description": "Menu ID you want to delete",
+            "description": "Menu ID you want to delete<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -349,14 +339,14 @@
           "Submenu"
         ],
         "summary": "Get all submenus",
-        "description": "Get a list of all submenus",
+        "description": "Get list of all submenus",
         "operationId": "get_all_submenus_api_v1_menus__target_menu_id__submenus_get",
         "parameters": [
           {
             "name": "target_menu_id",
             "in": "path",
             "required": true,
-            "description": "Menu ID whose submenus you want to get",
+            "description": "Menu ID whose submenus you want to get<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -375,16 +365,6 @@
                   "items": {
                     "$ref": "#/components/schemas/ResponseSubmenu"
                   }
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/422Error"
                 }
               }
             }
@@ -413,7 +393,7 @@
             "name": "target_menu_id",
             "in": "path",
             "required": true,
-            "description": "Menu ID that the submenu will belong to",
+            "description": "Menu ID that the submenu will belong to<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -499,7 +479,7 @@
             "name": "target_menu_id",
             "in": "path",
             "required": true,
-            "description": "Menu ID that the submenu will belong to",
+            "description": "Menu ID that the submenu will belong to<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -511,7 +491,7 @@
             "name": "target_submenu_id",
             "in": "path",
             "required": true,
-            "description": "Submenu ID you want to get",
+            "description": "Submenu ID you want to get<br><br>",
             "example": "bf1ee5a5-d83b-4c9e-8844-529a974fc317",
             "schema": {
               "type": "string",
@@ -575,7 +555,7 @@
             "name": "target_menu_id",
             "in": "path",
             "required": true,
-            "description": "Menu ID that the submenu will belong to",
+            "description": "Menu ID that the submenu will belong to<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -587,7 +567,7 @@
             "name": "target_submenu_id",
             "in": "path",
             "required": true,
-            "description": "Submenu ID you want to patch",
+            "description": "Submenu ID you want to patch<br><br>",
             "example": "bf1ee5a5-d83b-4c9e-8844-529a974fc317",
             "schema": {
               "type": "string",
@@ -671,7 +651,7 @@
             "name": "target_menu_id",
             "in": "path",
             "required": true,
-            "description": "Menu ID that the submenu will belong to",
+            "description": "Menu ID that the submenu will belong to<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -683,7 +663,7 @@
             "name": "target_submenu_id",
             "in": "path",
             "required": true,
-            "description": "Submenu ID you want to delete",
+            "description": "Submenu ID you want to delete<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -742,14 +722,14 @@
           "Dish"
         ],
         "summary": "Get all dishes",
-        "description": "Get a list of all dishes",
+        "description": "Get list of all dishes",
         "operationId": "get_all_dishes_api_v1_menus__menu_id__submenus__target_submenu_id__dishes_get",
         "parameters": [
           {
             "name": "target_menu_id",
             "in": "path",
             "required": true,
-            "description": "Menu ID that the submenu will belong to",
+            "description": "Menu ID that the submenu will belong to<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -761,7 +741,7 @@
             "name": "target_submenu_id",
             "in": "path",
             "required": true,
-            "description": "Submenu ID that the dish will belong to",
+            "description": "Submenu ID that the dish will belong to<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -780,16 +760,6 @@
                   "items": {
                     "$ref": "#/components/schemas/ResponseDish"
                   }
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/422Error"
                 }
               }
             }
@@ -818,7 +788,7 @@
             "name": "target_menu_id",
             "in": "path",
             "required": true,
-            "description": "Menu ID that the submenu will belong to",
+            "description": "Menu ID that the submenu will belong to<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -830,7 +800,7 @@
             "name": "target_submenu_id",
             "in": "path",
             "required": true,
-            "description": "Submenu ID that the dish will belong to",
+            "description": "Submenu ID that the dish will belong to<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -916,7 +886,7 @@
             "name": "target_menu_id",
             "in": "path",
             "required": true,
-            "description": "Menu ID that the submenu will belong to",
+            "description": "Menu ID that the submenu will belong to<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -928,7 +898,7 @@
             "name": "target_submenu_id",
             "in": "path",
             "required": true,
-            "description": "Submenu ID that the dish will belong to",
+            "description": "Submenu ID that the dish will belong to<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -940,7 +910,7 @@
             "name": "target_dish_id",
             "in": "path",
             "required": true,
-            "description": "Dish ID you want to get",
+            "description": "Dish ID you want to get<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -1004,7 +974,7 @@
             "name": "target_menu_id",
             "in": "path",
             "required": true,
-            "description": "Menu ID that the submenu will belong to",
+            "description": "Menu ID that the submenu will belong to<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -1016,7 +986,7 @@
             "name": "target_submenu_id",
             "in": "path",
             "required": true,
-            "description": "Submenu ID that the dish will belong to",
+            "description": "Submenu ID that the dish will belong to<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -1028,7 +998,7 @@
             "name": "target_dish_id",
             "in": "path",
             "required": true,
-            "description": "Dish ID you want to update",
+            "description": "Dish ID you want to update<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -1112,7 +1082,7 @@
             "name": "target_menu_id",
             "in": "path",
             "required": true,
-            "description": "Menu ID that the submenu will belong to",
+            "description": "Menu ID that the submenu will belong to<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -1124,7 +1094,7 @@
             "name": "target_submenu_id",
             "in": "path",
             "required": true,
-            "description": "Submenu ID that the dish will belong to",
+            "description": "Submenu ID that the dish will belong to<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -1136,7 +1106,7 @@
             "name": "target_dish_id",
             "in": "path",
             "required": true,
-            "description": "Dish ID you want to update",
+            "description": "Dish ID you want to update<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -1172,6 +1142,38 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/422Error"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/all_data": {
+      "get": {
+        "tags": [
+          "Get all data"
+        ],
+        "summary": "Get full menu",
+        "description": "Get list of menus with all submenus and dishes",
+        "operationId": "get_all_data_api_v1_all_data_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResponseFullMenu"
                 }
               }
             }
@@ -1377,6 +1379,83 @@
         "required": [
           "title"
         ]
+      },
+      "ResponseFullDish": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "title": "Description"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              }
+            ],
+            "title": "Price"
+          }
+        },
+        "type": "object",
+        "title": "ResponseFullDish"
+      },
+      "ResponseFullSubmenu": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "title": "Description"
+          },
+          "dishes_list": {
+            "$ref": "#/components/schemas/ResponseFullDish"
+          }
+        },
+        "type": "object",
+        "title": "ResponseFullSubmenu"
+      },
+      "ResponseFullMenu": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "title": "Description"
+          },
+          "submenus_list": {
+            "$ref": "#/components/schemas/ResponseFullSubmenu"
+          }
+        },
+        "type": "object",
+        "title": "ResponseFullMenu"
       },
       "404Error": {
         "type": "object",
