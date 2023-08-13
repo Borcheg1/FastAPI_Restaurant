@@ -58,7 +58,7 @@ data: dict[str, Any] = {
     },
 }
 
-path = '/all_data/get'
+path = '/all_data'
 
 
 async def test_get_empty(async_client: AsyncClient):
