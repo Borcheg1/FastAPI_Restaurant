@@ -44,7 +44,7 @@ services:
     image: rabbitmq:alpine
     healthcheck:
       test: rabbitmq-diagnostics -q ping
-      interval: 10s
+      interval: 20s
       timeout: 30s
       retries: 5
 
@@ -53,13 +53,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile-celery
+    entrypoint: ./celery_entrypoint.sh
     depends_on:
       rabbitmq:
         condition: service_healthy
 
     volumes:
       - ./:/volume_data
-    entrypoint: ./celery_entrypoint.sh
 
 volumes:
   postgres_data:
