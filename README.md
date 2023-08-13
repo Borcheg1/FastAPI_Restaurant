@@ -28,7 +28,7 @@ and data in the database.
 
 5. Enter the command `docker-compose up --build` and wait for the containers to build
 
-6. Open browser and go to `localhost:8000/docs#/`
+6. Open browser and go to `http://127.0.0.1:8000/docs#/`
 
 ### <span style="color:red"><ins>Note!</ins></span>
 > If you are using Windows, before entering the command `docker-compose up --build`, you need to open
@@ -95,7 +95,7 @@ variables for your database. Including set `DB_HOST=localhost` and `REDIS_HOST=l
 10. Run the application with the command:
 `uvicorn src.main:app`
 
-11. Open a browser and go to `localhost:8000/docs#/`
+11. Open a browser and go to `http://127.0.0.1:8000/docs#/`
 
 ### **2.2 Run tests**
 
