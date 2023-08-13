@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    volumes:
+      - ./:/volume_data
     ports:
       - '8000:8000'
     depends_on:
@@ -34,6 +36,19 @@ services:
   redis:
     container_name: redis_db
     image: redis:alpine
+
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:alpine
+
+  celery:
+    container_name: celery
+    build:
+      context: .
+      dockerfile: Dockerfile-celery
+    volumes:
+      - ./:/volume_data
+    entrypoint: celery_entrypoint.sh
 
 volumes:
   postgres_data:
