@@ -18,9 +18,10 @@ global_submenu_id = None
 
 
 @celery_app.task(name='check_excel')
-def create_task():
+def create_task() -> str:
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(compare_data())
+    result = loop.run_until_complete(compare_data())
+    return result
 
 
 async def _read_excel_file(path: str) -> tuple[list[Any], dict[str, list]]:
@@ -130,7 +131,7 @@ async def _get_data_from_db() -> Sequence[Row[tuple[Any]]]:
     return result
 
 
-async def compare_data() -> None:
+async def compare_data() -> str:
     sql_data = await _get_data_from_db()
 
     excel_data_list, excel_data_dict = await _read_excel_file('admin/Menu.xlsx')
@@ -138,12 +139,12 @@ async def compare_data() -> None:
     excel_data_list.sort(key=lambda x: x[1])
 
     if excel_data_list == sql_data:
-        return
+        return 'No changes found in excel file'
     else:
         if not excel_data_list:
             await create_tables()
             await delete_cache()
-            return
+            return 'Excel file is empty, database cleared'
         excel_data_dict_wo_none = await _delete_none(excel_data_dict)
         async with async_session() as session:
             await create_tables()
@@ -152,8 +153,7 @@ async def compare_data() -> None:
             await session.execute(insert(Submenu).values(excel_data_dict_wo_none['submenus']))
             await session.execute(insert(Dish).values(excel_data_dict_wo_none['dishes']))
             await session.commit()
-
-        return
+        return 'Changes detected between excel file and database, database updated'
 
 
 async def _delete_none(excel_data_dict: dict) -> dict[str, list]:
