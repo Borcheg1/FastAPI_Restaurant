@@ -13,6 +13,8 @@ services:
     depends_on:
       postgres_db:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   postgres_db:
     container_name: postgres_db
@@ -40,15 +42,24 @@ services:
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:alpine
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 30s
+      retries: 5
 
   celery:
     container_name: celery
     build:
       context: .
       dockerfile: Dockerfile-celery
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
     volumes:
       - ./:/volume_data
-    entrypoint: celery_entrypoint.sh
+    entrypoint: ./celery_entrypoint.sh
 
 volumes:
   postgres_data:
