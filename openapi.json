@@ -196,7 +196,7 @@
             "name": "target_menu_id",
             "in": "path",
             "required": true,
-            "description": "Menu ID you want to patch<br><br>",
+            "description": "Menu ID you want to update<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -567,7 +567,7 @@
             "name": "target_submenu_id",
             "in": "path",
             "required": true,
-            "description": "Submenu ID you want to patch<br><br>",
+            "description": "Submenu ID you want to update<br><br>",
             "example": "bf1ee5a5-d83b-4c9e-8844-529a974fc317",
             "schema": {
               "type": "string",
@@ -741,7 +741,7 @@
             "name": "target_submenu_id",
             "in": "path",
             "required": true,
-            "description": "Submenu ID that the dish will belong to<br><br>",
+            "description": "Submenu ID that the dishes will belong to<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
@@ -1106,7 +1106,7 @@
             "name": "target_dish_id",
             "in": "path",
             "required": true,
-            "description": "Dish ID you want to update<br><br>",
+            "description": "Dish ID you want to delete<br><br>",
             "example": "b16ac824-f6b1-47e8-8794-7e2a1341b3bf",
             "schema": {
               "type": "string",
