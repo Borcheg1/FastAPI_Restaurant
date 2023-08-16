@@ -6,6 +6,16 @@ from src.schemas import ResponseFullDish, ResponseFullMenu, ResponseFullSubmenu
 
 
 class FullMenuRepository:
+    """A class to prepare data from db for all_data handlers.
+
+    Class variable:
+        dishes_subquery: Subquery for submenus_subquery.
+        submenus_subquery: Subquery for query.
+        query: Query to get all data from Menu, Submenu, Dish tables.
+
+    Methods:
+        get: Get data from db.
+    """
     dishes_subquery = (
         select(
             Dish.submenu_id.label('submenu_id'),
@@ -40,19 +50,27 @@ class FullMenuRepository:
         submenus_subquery.c.dishes_list
     ).order_by(Menu.id)
 
-    async def get(self, session: AsyncSession) -> list[ResponseFullMenu | None]:
+    async def get(self, session: AsyncSession) -> list[ResponseFullMenu] | list:
+        """Get data from db, parse it, convert to json and return it.
+
+        session: Database session.
+        """
         result = await session.execute(self.query)
 
         full_menus_list = list()
         for row in result.all():
-            dct = await self._parse_row(row)
-            full_menus_list.append(dct)
+            full_menu_item = await self._parse_row(row)
+            full_menus_list.append(full_menu_item)
 
         response = await self._create_json(full_menus_list)
         return response
 
     @staticmethod
     async def _parse_row(row: Row) -> ResponseFullMenu:
+        """Protected method for parsing data from db to pydantic schema.
+
+        row: One row of data from the database.
+        """
         uuid, title, description, submenus_list, dishes_list = row
 
         full_menu_item = ResponseFullMenu(**{
@@ -79,13 +97,18 @@ class FullMenuRepository:
         return full_menu_item
 
     @staticmethod
-    async def _create_json(full_menus_list):
-        temp_dct = {}
+    async def _create_json(full_menus_list: list[ResponseFullMenu]) -> list[ResponseFullMenu]:
+        """Protected method for creating json from list of pydantic schemas.
+        Combining items by common ID.
+
+        full_menus_list: List of pydantic schemas "ResponseFullMenu".
+        """
+        full_menus_dict: dict = dict()
         for item in full_menus_list:
-            if item.id in temp_dct:
+            if item.id in full_menus_dict:
                 if item.submenus_list:
-                    temp_dct[item.id].submenus_list.extend(item.submenus_list)
-            elif not (item.id in temp_dct):
-                temp_dct[item.id] = item
-        result = [values for values in temp_dct.values()]
+                    full_menus_dict[item.id].submenus_list.extend(item.submenus_list)
+            elif not (item.id in full_menus_dict):
+                full_menus_dict[item.id] = item
+        result = [values for values in full_menus_dict.values()]
         return result
