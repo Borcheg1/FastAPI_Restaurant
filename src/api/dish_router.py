@@ -20,7 +20,15 @@ async def get_all_dishes(
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> list[ResponseDish]:
-    """Get dishes list from db and return them."""
+    """Get from db list of all dishes and return it.
+
+    target_menu_id: Menu ID that the submenu will belong to.
+    target_submenu_id: Submenu ID that the dishes will belong to.
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
+    """
     return await dish_service.get_all_dishes(
         session, redis_client, target_menu_id, target_submenu_id, background_tasks
     )
@@ -38,9 +46,15 @@ async def get_dish_by_id(
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseDish:
-    """Get dish from db and return it.
+    """Get from db a specific dish by a specific ID and return it.
 
-    target_dish_id: Current dish id.
+    target_menu_id: Menu ID that the submenu will belong to.
+    target_submenu_id: Submenu ID that the dish will belong to.
+    target_dish_id: Dish ID you want to get.
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
     """
     return await dish_service.get_dish_by_id(
         session, redis_client, target_menu_id, target_submenu_id, target_dish_id, background_tasks
@@ -57,10 +71,16 @@ async def add_dish(
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseDish:
-    """Add new dish to db and return it.
+    """
+    Add a dish to db and return it.
 
-    target_submenu_id: Current submenu id.
+    target_menu_id: Menu ID that the submenu will belong to.
+    target_submenu_id: Submenu ID that the dish will belong to.
     new_dish: Pydantic schema for request body.
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
     """
     return await dish_service.add_dish(
         session, redis_client, target_menu_id, target_submenu_id, new_dish, background_tasks
@@ -80,10 +100,17 @@ async def update_dish(
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseDish:
-    """Update dish in db and return it.
+    """
+    Update in db a specific dish by a specific ID and return it.
 
-    target_dish_id: Current dish id.
+    target_menu_id: Menu ID that the submenu will belong to.
+    target_submenu_id: Submenu ID that the dish will belong to.
+    target_dish_id: Dish ID you want to update.
     new_dish: Pydantic schema for request body.
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
     """
     return await dish_service.update_dish(
         session, redis_client, target_menu_id, target_submenu_id,
@@ -103,6 +130,16 @@ async def delete_dish(
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseMessage:
+    """Delete from db a specific dish by a specific ID.
+
+    target_menu_id: Menu ID that the submenu will belong to.
+    target_submenu_id: Submenu ID that the dish will belong to.
+    target_dish_id: Dish ID you want to delete.
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
+    """
     return await dish_service.delete_dish(
         session, redis_client, target_menu_id, target_submenu_id, target_dish_id, background_tasks
     )

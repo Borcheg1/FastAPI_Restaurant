@@ -12,6 +12,7 @@ app.include_router(main_router)
 
 
 def custom_openapi() -> dict[str, Any]:
+    """Convert openapi.json from json to dictionary"""
     with open('openapi.json') as file:
         return json.load(file)
 

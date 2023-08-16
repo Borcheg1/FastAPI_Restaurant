@@ -11,6 +11,22 @@ from src.schemas import BaseRequestModel, ResponseMessage, ResponseSubmenu
 
 
 class SubmenuRepository:
+    """A class to prepare data from db for submenu handlers.
+
+        Class variable:
+            col: Columns in a database table "Submenu" that are used when
+            returning a response.
+
+        Instance variable:
+            menu_repository: A class instance to prepare data for menu handlers.
+
+        Methods:
+            get_all: Get from db all submenus.
+            get_by_id: Get from db a specific submenu by a specific ID.
+            add: Add a submenu to db.
+            update: Update in db a specific submenu by a specific ID.
+            delete: Delete from db a specific submenu by a specific ID.
+        """
     col = ('id', 'title', 'description', 'dishes_count')
 
     def __init__(self):
@@ -19,6 +35,12 @@ class SubmenuRepository:
     async def get_all(
         self, session: AsyncSession, menu_id: UUID
     ) -> list[ResponseSubmenu]:
+        """Get from db all submenus,
+        convert it to list of pydantic schemas and return it.
+
+        session: Database session.
+        menu_id: Menu ID that the submenu will belong to.
+        """
         query = await session.execute(
             select(
                 Submenu.id,
@@ -40,6 +62,13 @@ class SubmenuRepository:
     async def get_by_id(
         self, session: AsyncSession, menu_id: UUID, submenu_id: UUID
     ) -> ResponseSubmenu:
+        """Get from db a specific submenu by a specific ID,
+        convert it to pydantic schema and return it.
+
+        session: Database session.
+        menu_id: Menu ID that the submenu will belong to.
+        submenu_id: Submenu ID you want to get.
+        """
         query = await session.execute(
             select(
                 Submenu.id,
@@ -63,6 +92,13 @@ class SubmenuRepository:
         self, session: AsyncSession, menu_id: UUID,
         new_submenu: BaseRequestModel
     ) -> ResponseSubmenu:
+        """Add a submenu to db,
+        convert submenu data to pydantic schema and return it.
+
+        session: Database session.
+        menu_id: Menu ID that the submenu will belong to.
+        new_submenu: Pydantic schema for request body.
+        """
         check_menu = await self.menu_repository.get_by_id(session, menu_id)
         if not check_menu:
             raise HTTPException(status_code=404, detail='submenu not found')
@@ -92,6 +128,14 @@ class SubmenuRepository:
         self, session: AsyncSession, menu_id: UUID, submenu_id: UUID,
         new_submenu: BaseRequestModel
     ) -> ResponseSubmenu:
+        """Update in db a specific submenu by a specific ID,
+        convert submenu data to pydantic schema and return it.
+
+        session: Database session.
+        menu_id: Menu ID that the submenu will belong to.
+        submenu_id: Submenu ID you want to update.
+        new_submenu: Pydantic schema for request body.
+        """
         updating_submenu = await self.get_by_id(session, menu_id, submenu_id)
 
         if not updating_submenu:
@@ -123,6 +167,13 @@ class SubmenuRepository:
     async def delete(
         self, session: AsyncSession, menu_id: UUID, submenu_id: UUID
     ) -> ResponseMessage:
+        """Delete from db a specific submenu by a specific ID,
+        and returning message with delete status.
+
+        session: Database session.
+        menu_id: Menu ID that the submenu will belong to.
+        submenu_id: Submenu ID you want to delete.
+        """
         check_menu = await self.menu_repository.get_by_id(session, menu_id)
         if not check_menu:
             raise HTTPException(status_code=404, detail='submenu not found')

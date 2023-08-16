@@ -20,7 +20,13 @@ async def get_all_menus(
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> list[ResponseMenu]:
-    """Get menus list from db and return them."""
+    """Get from db list of all menus and return it.
+
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
+    """
     return await menu_service.get_all_menus(session, redis_client, background_tasks)
 
 
@@ -34,9 +40,13 @@ async def get_menu_by_id(
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseMenu:
-    """Get menu from db and return it.
+    """Get from db a specific menu by a specific ID.
 
-    target_menu_id: Current menu id.
+    target_menu_id: Menu ID you want to get.
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
     """
     return await menu_service.get_menu_by_id(
         session, redis_client, target_menu_id, background_tasks
@@ -52,9 +62,13 @@ async def add_menu(
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseMenu:
-    """Add new submenu to db and return it.
+    """Add a menu to db and return it.
 
     new_menu: Pydantic schema for request body.
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
     """
     return await menu_service.add_menu(session, redis_client, new_menu, background_tasks)
 
@@ -70,10 +84,14 @@ async def update_menu(
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseMenu:
-    """Update menu in db and return it.
+    """Update in db a specific menu by a specific id.
 
-    target_menu_id: Current menu id.
+    target_menu_id: Menu ID you want to update.
     new_menu: Pydantic schema for request body.
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
     """
     return await menu_service.update_menu(
         session, redis_client, target_menu_id, new_menu, background_tasks
@@ -90,8 +108,12 @@ async def delete_menu(
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseMessage:
-    """Delete menu from db and return message.
+    """Delete from db a specific menu by a specific id.
 
-    target_menu_id: Current menu id.
+    target_menu_id: Menu ID you want to delete.
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
     """
     return await menu_service.delete_menu(session, redis_client, target_menu_id, background_tasks)

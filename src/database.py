@@ -38,12 +38,13 @@ async def get_redis_client() -> AsyncGenerator[Redis, None]:
 
 
 async def create_tables() -> None:
-    """Drop and recreate tables in db, clear cache in redis"""
+    """Drop and recreate tables in db"""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
 
 async def delete_cache() -> None:
+    """Clear all cache in redis"""
     async with redis as client:
         await client.flushdb()

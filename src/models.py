@@ -7,7 +7,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 from src.database import Base
 
 
-def get_uuid():
+def get_uuid() -> uuid.UUID:
+    """Function for getting and returning uuid"""
     return uuid.uuid4()
 
 

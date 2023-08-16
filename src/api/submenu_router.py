@@ -21,7 +21,14 @@ async def get_all_submenus(
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> list[ResponseSubmenu]:
-    """Get dishes list from db and return them."""
+    """Get from db list of all submenus and return it.
+
+    target_menu_id: Menu ID that the submenu will belong to.
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
+    """
     return await submenu_service.get_all_submenus(
         session, redis_client, target_menu_id, background_tasks
     )
@@ -39,9 +46,14 @@ async def get_submenu_by_id(
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseSubmenu:
-    """Get submenu from db and return it.
+    """Get from db a specific submenu by a specific ID.
 
-    target_submenu_id: Current submenu id.
+    target_menu_id: Menu ID that the submenu will belong to.
+    target_submenu_id: Submenu ID you want to get.
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
     """
     return await submenu_service.get_submenu_by_id(
         session, redis_client, target_menu_id, target_submenu_id, background_tasks
@@ -58,10 +70,14 @@ async def add_submenu(
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseSubmenu:
-    """Add new submenu to db and return it.
+    """Add a submenu to db and return it.
 
-    target_menu_id: Current menu id.
+    target_menu_id: Menu ID that the submenu will belong to.
     new_submenu: Pydantic schema for request body.
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
     """
     return await submenu_service.add_submenu(
         session, redis_client, target_menu_id, new_submenu, background_tasks
@@ -81,10 +97,15 @@ async def update_submenu(
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseSubmenu:
-    """Update submenu in db and return it.
+    """Update in db a specific submenu by a specific ID.
 
-    target_submenu_id: Current submenu id.
+    target_menu_id: Menu ID that the submenu will belong to.
+    target_submenu_id: Submenu ID you want to update.
     new_submenu: Pydantic schema for request body.
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
     """
     return await submenu_service.update_submenu(
         session, redis_client, target_menu_id, target_submenu_id, new_submenu, background_tasks
@@ -103,9 +124,14 @@ async def delete_submenu(
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
 ) -> ResponseMessage:
-    """Delete submenu from db and return message.
+    """Delete from db a specific submenu by a specific ID.
 
-    target_submenu_id: Current submenu id.
+    target_menu_id: Menu ID that the submenu will belong to.
+    target_submenu_id: Submenu ID you want to delete.
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
     """
     return await submenu_service.delete_submenu(
         session, redis_client, target_menu_id, target_submenu_id, background_tasks

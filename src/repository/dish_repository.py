@@ -11,6 +11,21 @@ from src.schemas import RequestDish, ResponseDish, ResponseMessage
 
 
 class DishRepository:
+    """A class to prepare data from db for dish handlers.
+
+    Class variable:
+        col: Columns in a database table "Dish" that are used when returning a response.
+
+    Instance variable:
+        submenu_repository: A class instance to prepare data for submenu handlers.
+
+    Methods:
+        get_all: Get from db all dishes.
+        get_by_id: Get from db a specific dish by a specific ID.
+        add: Add a dish to db.
+        update: Update in db a specific dish by a specific ID.
+        delete: Delete from db a specific dish by a specific ID.
+    """
     col = ('id', 'title', 'description', 'price')
 
     def __init__(self):
@@ -19,6 +34,13 @@ class DishRepository:
     async def get_all(
         self, session: AsyncSession, menu_id: UUID, submenu_id: UUID
     ) -> list[ResponseDish] | list:
+        """Get from db all dishes,
+        convert it to list of pydantic schemas and return it.
+
+        session: Database session.
+        menu_id: Menu ID that the submenu will belong to.
+        submenu_id: Submenu ID that the dishes will belong to.
+        """
         query = await session.execute(
             select(
                 Dish.id,
@@ -41,6 +63,14 @@ class DishRepository:
         self, session: AsyncSession, menu_id: UUID, submenu_id: UUID,
         dish_id: UUID
     ) -> ResponseDish:
+        """Get from db a specific dish by a specific ID,
+        convert it to pydantic schema and return it.
+
+        session: Database session.
+        menu_id: Menu ID that the submenu will belong to.
+        submenu_id: Submenu ID that the dish will belong to.
+        dish_id: Dish ID you want to get.
+        """
         query = await session.execute(
             select(
                 Dish.id,
@@ -69,6 +99,14 @@ class DishRepository:
         self, session: AsyncSession, menu_id: UUID, submenu_id: UUID,
         new_dish: RequestDish
     ) -> ResponseDish:
+        """Add a dish to db,
+        convert dish data to pydantic schema and return it.
+
+        session: Database session.
+        menu_id: Menu ID that the submenu will belong to.
+        submenu_id: Submenu ID that the dish will belong to.
+        new_dish: Pydantic schema for request body.
+        """
         check_menu = await self.submenu_repository.get_by_id(
             session, menu_id, submenu_id
         )
@@ -98,6 +136,15 @@ class DishRepository:
         self, session: AsyncSession, menu_id: UUID, submenu_id: UUID,
         dish_id: UUID, new_dish: RequestDish
     ) -> ResponseDish:
+        """Update in db a specific dish by a specific ID,
+        convert dish data to pydantic schema and return it.
+
+        session: Database session.
+        menu_id: Menu ID that the submenu will belong to.
+        submenu_id: Submenu ID that the dish will belong to.
+        dish_id: Dish ID you want to update.
+        new_dish: Pydantic schema for request body.
+        """
         updating_dish = await self.get_by_id(
             session, menu_id, submenu_id, dish_id
         )
@@ -134,6 +181,14 @@ class DishRepository:
         self, session: AsyncSession, menu_id: UUID, submenu_id: UUID,
         dish_id: UUID
     ) -> ResponseMessage:
+        """Delete from db a specific dish by a specific ID,
+        and returning message with delete status.
+
+        session: Database session.
+        menu_id: Menu ID that the submenu will belong to.
+        submenu_id: Submenu ID that the dish will belong to.
+        dish_id: Dish ID you want to delete.
+        """
         check_menu = await self.submenu_repository.get_by_id(
             session, menu_id, submenu_id
         )

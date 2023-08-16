@@ -8,13 +8,30 @@ from src.schemas import ResponseFullMenu
 
 
 class FullMenuService:
+    """A class to prepare data (adding caching) for all_data handlers.
+
+    Instance variable:
+        full_menu_repository: A class to prepare data from db for all_data handlers.
+        redis_cache: A class instance for storing and handling the cache.
+
+    Methods:
+        get_full_menu: Get data from db or cache and return it.
+    """
+
     def __init__(self):
         self.full_menu_repository = FullMenuRepository()
         self.redis_cache = Cache()
 
     async def get_full_menu(
         self, session: AsyncSession, redis_client: Redis, background_task: BackgroundTasks
-    ) -> list[ResponseFullMenu | None]:
+    ) -> list[ResponseFullMenu] | list:
+        """Get data from db or cache and return it.
+
+        session: Database session.
+        redis_client: Redis session.
+        background_task: class instance FastAPI BackgroundTasks
+        "tasks to be run after returning a response".
+        """
         cache = await self.redis_cache.get(redis_client, 'full')
         if cache is not None:
             return cache

@@ -15,5 +15,12 @@ async def get_full_menu(
     background_task: BackgroundTasks,
     session: AsyncSession = Depends(get_async_session),
     redis_client: Redis = Depends(get_redis_client),
-) -> list[ResponseFullMenu | None]:
+) -> list[ResponseFullMenu] | list:
+    """Get from db list of menus with all submenus and dishes and return it.
+
+    background_tasks: class instance FastAPI BackgroundTasks
+    "tasks to be run after returning a response".
+    session: Database session.
+    redis_client: Redis session.
+    """
     return await full_menu_service.get_full_menu(session, redis_client, background_task)

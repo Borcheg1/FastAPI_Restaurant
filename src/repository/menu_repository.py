@@ -10,9 +10,27 @@ from src.schemas import BaseRequestModel, ResponseMenu, ResponseMessage
 
 
 class MenuRepository:
+    """A class to prepare data from db for menu handlers.
+
+        Class variable:
+            col: Columns in a database table "Menu" that are used when
+            returning a response.
+
+        Methods:
+            get_all: Get from db all menus.
+            get_by_id: Get from db a specific menu by a specific ID.
+            add: Add a menu to db.
+            update: Update in db a specific menu by a specific ID.
+            delete: Delete from db a specific menu by a specific ID.
+        """
     col = ('id', 'title', 'description', 'submenus_count', 'dishes_count')
 
     async def get_all(self, session: AsyncSession) -> list[ResponseMenu]:
+        """Get from db all menus,
+        convert it to list of pydantic schemas and return it.
+
+        session: Database session.
+        """
         query = await session.execute(
             select(
                 Menu.id,
@@ -32,6 +50,12 @@ class MenuRepository:
     async def get_by_id(
         self, session: AsyncSession, menu_id: UUID
     ) -> ResponseMenu:
+        """Get from db a specific menu by a specific ID,
+        convert it to pydantic schema and return it.
+
+        session: Database session.
+        menu_id: Menu ID you want to get.
+        """
         query = await session.execute(
             select(
                 Menu.id,
@@ -57,6 +81,12 @@ class MenuRepository:
     async def add(
         session: AsyncSession, new_menu: BaseRequestModel
     ) -> ResponseMenu:
+        """Add a menu to db,
+        convert menu data to pydantic schema and return it.
+
+        session: Database session.
+        new_menu: Pydantic schema for request body.
+        """
         try:
             await session.execute(insert(Menu).values(**dict(new_menu)))
         except IntegrityError:
@@ -80,6 +110,13 @@ class MenuRepository:
         self, session: AsyncSession, menu_id: UUID,
         new_menu: BaseRequestModel
     ) -> ResponseMenu:
+        """Update in db a specific menu by a specific ID,
+        convert menu data to pydantic schema and return it.
+
+        session: Database session.
+        menu_id: Menu ID you want to update.
+        new_menu: Pydantic schema for request body.
+        """
         updating_menu = await self.get_by_id(session, menu_id)
 
         if not updating_menu:
@@ -110,6 +147,12 @@ class MenuRepository:
 
     @staticmethod
     async def delete(session: AsyncSession, menu_id: UUID) -> ResponseMessage:
+        """Delete from db a specific menu by a specific ID,
+        and returning message with delete status.
+
+        session: Database session.
+        menu_id: Menu ID you want to delete.
+        """
         deleting_menu = await session.execute(
             delete(Menu).where(Menu.id == menu_id)
         )
