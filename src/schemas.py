@@ -37,22 +37,13 @@ class ResponseMessage(BaseModel):
     message: str
 
 
-class ResponseFullDish(BaseModel):
-    id: UUID
-    title: str
-    description: str | None
-    price: str
+class ResponseFullDish(ResponseDish):
+    pass
 
 
-class ResponseFullSubmenu(BaseModel):
-    id: UUID
-    title: str
-    description: str | None
+class ResponseFullSubmenu(BaseResponseModel):
     dishes_list: list[ResponseFullDish] | list
 
 
-class ResponseFullMenu(BaseModel):
-    id: UUID
-    title: str
-    description: str | None
+class ResponseFullMenu(BaseResponseModel):
     submenus_list: list[ResponseFullSubmenu] | list
