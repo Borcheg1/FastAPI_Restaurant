@@ -98,9 +98,11 @@ async def test_get_with_submenu(async_client: AsyncClient, mocker: MockerFixture
     submenu = response.json()[0]['submenus_list'][0]
 
     assert response.status_code == 200
+
     assert response.json()[0]['id'] == data['menu1']['id']
     assert response.json()[0]['title'] == data['menu1']['title']
     assert response.json()[0]['description'] == data['menu1']['description']
+
     assert submenu['id'] == data['submenu1']['id']
     assert submenu['title'] == data['submenu1']['title']
     assert submenu['description'] == data['submenu1']['description']
