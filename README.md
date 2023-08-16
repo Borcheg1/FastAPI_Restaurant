@@ -1,9 +1,11 @@
 # FastAPI Restaurant
 ![Static Badge](https://img.shields.io/badge/Language-Python_3.11-blue)
-![Static Badge](https://img.shields.io/badge/Framework-FastAPI-red)
-![Static Badge](https://img.shields.io/badge/SQL_Database-PostgreSQL-ygreen)
-![Static Badge](https://img.shields.io/badge/ORM-SQLAlchemy-orange)
-![Static Badge](https://img.shields.io/badge/NoSQL_Database-Redis-green)
+![Static Badge](https://img.shields.io/badge/Framework-FastAPI-3CB371)
+![Static Badge](https://img.shields.io/badge/SQL_Database-PostgreSQL-6495ED)
+![Static Badge](https://img.shields.io/badge/ORM-SQLAlchemy-DC143C)
+![Static Badge](https://img.shields.io/badge/NoSQL_Database-Redis-B22222)
+![Static Badge](https://img.shields.io/badge/Task_manager-Celery-ADFF2F)
+
 
 <h3>
 An application that allows you to perform CRUD operations for a chain of menus, submenus and dishes.<br>
