@@ -4,9 +4,11 @@ from uuid import UUID
 
 import pandas as pd
 from _decimal import Decimal
+from fastapi import HTTPException
 from sqlalchemy import INT
 from sqlalchemy import UUID as sql_uuid
 from sqlalchemy import Row, Sequence, insert, literal_column, select
+from sqlalchemy.exc import IntegrityError
 
 from src.cache.redis_cache import Cache
 from src.database import async_session, create_tables, delete_cache, redis
@@ -19,12 +21,19 @@ global_submenu_id = None
 
 @celery_app.task(name='check_excel')
 def create_task() -> str:
+    """Create a celery task and return string message about task status"""
     loop = asyncio.get_event_loop()
     result = loop.run_until_complete(compare_data())
     return result
 
 
 async def _read_excel_file(path: str) -> tuple[list[Any], dict[str, list]]:
+    """Protected function for read Excel file,
+    prepare list of data to compare with db data and
+    prepare dict of data to deleting None and adding to db.
+
+    path: Excel file path.
+    """
     data = pd.read_excel(path, header=None)
     excel_data_list = []
     excel_data_dict: dict = {
@@ -35,19 +44,25 @@ async def _read_excel_file(path: str) -> tuple[list[Any], dict[str, list]]:
 
     for idx, row in data.iterrows():
         row_data = row.values
-        data_as_sql, item_type = await _create_data_for_bd(row_data)
+        data_as_sql, item_category = await _create_data_for_bd(row_data)
         excel_data_list.append(data_as_sql)
-        if item_type == 'menu':
+        if item_category == 'menu':
             excel_data_dict['menus'].append(data_as_sql)
-        elif item_type == 'submenu':
+        elif item_category == 'submenu':
             excel_data_dict['submenus'].append(data_as_sql)
-        elif item_type == 'dish':
+        elif item_category == 'dish':
             excel_data_dict['dishes'].append(data_as_sql)
 
     return excel_data_list, excel_data_dict
 
 
 async def _create_data_for_bd(row_data: tuple) -> tuple[Any, str]:
+    """Protected function for preparing data to add to db and
+    returning tuple of data and item category.
+    Global variables are used to populate the bound id column.
+
+    row_data: row of value from Excel file.
+    """
     global global_menu_id
     global global_submenu_id
 
@@ -88,6 +103,9 @@ async def _create_data_for_bd(row_data: tuple) -> tuple[Any, str]:
 
 
 async def _get_data_from_db() -> Sequence[Row[tuple[Any]]]:
+    """Protected function for getting data from db or cache and
+    if there is no data in cache, add it there.
+    """
     query = select(
         Menu.id,
         Menu.title.label('title'),
@@ -132,6 +150,9 @@ async def _get_data_from_db() -> Sequence[Row[tuple[Any]]]:
 
 
 async def compare_data() -> str:
+    """Compares the data from the Excel file and the db and,
+    if the data differs, deletes the db and fills it with data from the Excel file.
+    """
     sql_data = await _get_data_from_db()
 
     excel_data_list, excel_data_dict = await _read_excel_file('admin/Menu.xlsx')
@@ -147,16 +168,27 @@ async def compare_data() -> str:
             return 'Excel file is empty, database cleared'
         excel_data_dict_wo_none = await _delete_none(excel_data_dict)
         async with async_session() as session:
-            await create_tables()
-            await delete_cache()
-            await session.execute(insert(Menu).values(excel_data_dict_wo_none['menus']))
-            await session.execute(insert(Submenu).values(excel_data_dict_wo_none['submenus']))
-            await session.execute(insert(Dish).values(excel_data_dict_wo_none['dishes']))
+            try:
+                await create_tables()
+                await delete_cache()
+                await session.execute(insert(Menu).values(excel_data_dict_wo_none['menus']))
+                await session.execute(insert(Submenu).values(excel_data_dict_wo_none['submenus']))
+                await session.execute(insert(Dish).values(excel_data_dict_wo_none['dishes']))
+            except IntegrityError:
+                await session.rollback()
+                raise HTTPException(
+                    status_code=409, detail='This title already exists'
+                )
             await session.commit()
         return 'Changes detected between excel file and database, database updated'
 
 
 async def _delete_none(excel_data_dict: dict) -> dict[str, list]:
+    """Protected function for deleting None values from dictionary with Excel data
+    and returning it.
+
+    excel_data_dict: Dictionary with Excel data.
+    """
     excel_data_dict_wo_none: dict = {
         'menus': [],
         'submenus': [],
