@@ -9,7 +9,7 @@ from src.database import redis
 from src.task.config import menu_excel_path
 
 
-async def check_discount() -> dict[UUID, float | None] | dict:
+async def check_discount() -> dict[UUID, Any] | dict:
     """Function for parsing Excel file,
     getting dishes discounts and return them.
     """
