@@ -130,4 +130,10 @@ I didn't complete task about Django reverse in tests, because in my opinion mock
 now in project:<br>
 &emsp;1. [OpenAPI](https://github.com/Borcheg1/FastAPI_Restaurant/blob/main/openapi.json)<br>
 
-In homework #4, no one tasks were completed because I didn't have time 😟
+In homework #4, no one tasks were completed because I didn't have time 😟 <br>
+**Update!**<br>
+The task for discounts was completed after the deadline, 17.08.<br>
+> commits:<br>
+&emsp;1. [Discounts](https://github.com/Borcheg1/FastAPI_Restaurant/tree/6b96302a7014ff45ee7542b0c1f6aa8b53c8921c/src)<br><br>
+now in project:<br>
+&emsp;1. [Discounts](https://github.com/Borcheg1/FastAPI_Restaurant/tree/main/src)<br>
