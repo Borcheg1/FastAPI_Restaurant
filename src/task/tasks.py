@@ -94,7 +94,7 @@ async def _create_data_for_bd(row_data: tuple) -> tuple[Any, str]:
                 data_as_sql.extend([
                     UUID(row_data[2]),
                     row_data[3],
-                    row_data[4] if not pd.isnull(row_data[2]) else 'null',
+                    row_data[4] if not pd.isnull(row_data[4]) else 'null',
                     round(Decimal(row_data[5]), 2),
                     UUID(global_submenu_id),
                 ])
