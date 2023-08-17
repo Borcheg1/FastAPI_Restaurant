@@ -29,3 +29,5 @@ celery_app.conf.beat_schedule = {
         'schedule': 15.0,
     },
 }
+
+menu_excel_path = 'admin/Menu.xlsx'
