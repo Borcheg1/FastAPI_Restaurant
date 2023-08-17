@@ -13,7 +13,8 @@ from sqlalchemy.exc import IntegrityError
 from src.cache.redis_cache import Cache
 from src.database import async_session, create_tables, delete_cache, redis
 from src.models import Dish, Menu, Submenu
-from src.task.config import celery_app
+from src.task.config import celery_app, menu_excel_path
+from src.utils.excel_discounts import different_between_discounts
 
 global_menu_id = None
 global_submenu_id = None
@@ -51,7 +52,7 @@ async def _read_excel_file(path: str) -> tuple[list[Any], dict[str, list]]:
         elif item_category == 'submenu':
             excel_data_dict['submenus'].append(data_as_sql)
         elif item_category == 'dish':
-            excel_data_dict['dishes'].append(data_as_sql)
+            excel_data_dict['dishes'].append(data_as_sql[:5])
 
     return excel_data_list, excel_data_dict
 
@@ -91,14 +92,25 @@ async def _create_data_for_bd(row_data: tuple) -> tuple[Any, str]:
             return tuple(data_as_sql), 'submenu'
         else:
             if not pd.isnull(row_data[2]):
-                data_as_sql.extend([
-                    UUID(row_data[2]),
-                    row_data[3],
-                    row_data[4] if not pd.isnull(row_data[4]) else 'null',
-                    round(Decimal(row_data[5]), 2),
-                    UUID(global_submenu_id),
-                ])
-                return tuple(data_as_sql), 'dish'
+                if len(row_data) == 7:
+                    data_as_sql.extend([
+                        UUID(row_data[2]),
+                        row_data[3],
+                        row_data[4] if not pd.isnull(row_data[4]) else 'null',
+                        round(Decimal(row_data[5]), 2),
+                        UUID(global_submenu_id),
+                        row_data[6] if not pd.isnull(row_data[6]) else None,
+                    ])
+                    return tuple(data_as_sql), 'dish'
+                else:
+                    data_as_sql.extend([
+                        UUID(row_data[2]),
+                        row_data[3],
+                        row_data[4] if not pd.isnull(row_data[4]) else 'null',
+                        round(Decimal(row_data[5]), 2),
+                        UUID(global_submenu_id),
+                    ])
+                    return tuple(data_as_sql), 'dish'
     return data_as_sql, 'menu'
 
 
@@ -155,18 +167,25 @@ async def compare_data() -> str:
     """
     sql_data = await _get_data_from_db()
 
-    excel_data_list, excel_data_dict = await _read_excel_file('admin/Menu.xlsx')
+    excel_data_list, excel_data_dict = await _read_excel_file(menu_excel_path)
+    excel_data_list_wo_discounts = [item[:5] for item in excel_data_list]
+    excel_data_list_wo_discounts.sort(key=lambda x: x[1])
 
-    excel_data_list.sort(key=lambda x: x[1])
-
-    if excel_data_list == sql_data:
-        return 'No changes found in excel file'
+    if excel_data_list_wo_discounts == sql_data:
+        result = await different_between_discounts(excel_data_list)
+        return result
     else:
-        if not excel_data_list:
+        if not excel_data_list_wo_discounts:
             await create_tables()
             await delete_cache()
+
+            async with redis as client:
+                cache = Cache()
+                await cache.add(client, 'excel', excel_data_list)
             return 'Excel file is empty, database cleared'
+
         excel_data_dict_wo_none = await _delete_none(excel_data_dict)
+
         async with async_session() as session:
             try:
                 await create_tables()
@@ -180,6 +199,10 @@ async def compare_data() -> str:
                     status_code=409, detail='This title already exists'
                 )
             await session.commit()
+
+        async with redis as client:
+            cache = Cache()
+            await cache.add(client, 'excel', excel_data_list)
         return 'Changes detected between excel file and database, database updated'
 
 
@@ -206,3 +229,7 @@ async def _delete_none(excel_data_dict: dict) -> dict[str, list]:
             excel_data_dict_wo_none[key].append(item_tuple)
 
     return excel_data_dict_wo_none
+
+#
+# result = asyncio.run(compare_data())
+# print(result)
