@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.models import Dish, Submenu
 from src.repository.submenu_repository import SubmenuRepository
 from src.schemas import RequestDish, ResponseDish, ResponseMessage
+from src.utils.excel_discounts import check_discount
 
 
 class DishRepository:
@@ -55,9 +56,18 @@ class DishRepository:
         if not rows:
             return []
 
-        dish = [ResponseDish(**(dict(zip(self.col, row), **{'price': str(row[3])})))
-                for row in rows]
-        return dish
+        dishes_list = list()
+        discounts = await check_discount()
+        for row in rows:
+            if row.id in discounts and discounts[row.id]:
+                dish = (dict(zip(self.col, row), **{'price': str(
+                    round(float(row[3]) - (float(row[3]) * discounts[row.id]), 2)
+                )}))
+                dishes_list.append(dish)
+            else:
+                dish = (dict(zip(self.col, row), **{'price': str(row[3])}))
+                dishes_list.append(dish)
+        return dishes_list
 
     async def get_by_id(
         self, session: AsyncSession, menu_id: UUID, submenu_id: UUID,
@@ -90,6 +100,15 @@ class DishRepository:
         if not row:
             raise HTTPException(status_code=404, detail='dish not found')
 
+        discounts = await check_discount()
+
+        if row.id in discounts and discounts[row.id]:
+            dish = ResponseDish(
+                **dict(zip(self.col, row), **{'price': str(
+                    round(float(row[3]) - (float(row[3]) * discounts[row.id]), 2)
+                )})
+            )
+            return dish
         dish = ResponseDish(
             **dict(zip(self.col, row), **{'price': str(round(row[3], 2))})
         )
@@ -129,7 +148,16 @@ class DishRepository:
         query = await session.execute(select(Dish.id).where(
             Dish.title == adding_dish['title']
         ))
-        dish = ResponseDish(**dict(adding_dish, **{'id': query.first()[0]}))
+
+        dish_id = query.first().id
+        discounts = await check_discount()
+
+        if dish_id in discounts and discounts[dish_id]:
+            adding_dish['price'] = str(
+                round(float(adding_dish['price']) - (float(adding_dish['price']) * discounts[dish_id]), 2)
+            )
+
+        dish = ResponseDish(**dict(adding_dish, **{'id': dish_id}))
         return dish
 
     async def update(
@@ -174,6 +202,14 @@ class DishRepository:
             )
 
         await session.commit()
+
+        discounts = await check_discount()
+
+        if dish_id in discounts and discounts[dish_id]:
+            updating_dish.price = str(
+                round(float(new_dish.price) - (float(new_dish.price) * discounts[dish_id]), 2)
+            )
+
         dish = ResponseDish(**dict(updating_dish))
         return dish
 

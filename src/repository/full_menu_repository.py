@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.models import Dish, Menu, Submenu
 from src.schemas import ResponseFullDish, ResponseFullMenu, ResponseFullSubmenu
+from src.utils.excel_discounts import check_discount
 
 
 class FullMenuRepository:
@@ -72,6 +73,7 @@ class FullMenuRepository:
         row: One row of data from the database.
         """
         uuid, title, description, submenus_list, dishes_list = row
+        discounts = await check_discount()
 
         full_menu_item = ResponseFullMenu(**{
             'id': uuid,
@@ -88,12 +90,22 @@ class FullMenuRepository:
             }))
         if dishes_list:
             for dish in dishes_list:
-                full_menu_item.submenus_list[0].dishes_list.append(ResponseFullDish(**{
-                    'id': dish[0],
-                    'title': dish[1],
-                    'description': dish[2],
-                    'price': str(round(dish[3], 2))
-                }))
+                if dish[0] in discounts and discounts[dish[0]]:
+                    full_menu_item.submenus_list[0].dishes_list.append(ResponseFullDish(**{
+                        'id': dish[0],
+                        'title': dish[1],
+                        'description': dish[2],
+                        'price': str(
+                            round(float(dish[3]) - (float(dish[3]) * discounts[dish[0]]), 2)
+                        )
+                    }))
+                else:
+                    full_menu_item.submenus_list[0].dishes_list.append(ResponseFullDish(**{
+                        'id': dish[0],
+                        'title': dish[1],
+                        'description': dish[2],
+                        'price': str(round(dish[3], 2))
+                    }))
         return full_menu_item
 
     @staticmethod
