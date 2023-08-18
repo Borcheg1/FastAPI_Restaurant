@@ -229,7 +229,3 @@ async def _delete_none(excel_data_dict: dict) -> dict[str, list]:
             excel_data_dict_wo_none[key].append(item_tuple)
 
     return excel_data_dict_wo_none
-
-#
-# result = asyncio.run(compare_data())
-# print(result)
