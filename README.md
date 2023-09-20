@@ -112,28 +112,3 @@ variables for your database. Including set `TEST_DB_HOST=localhost` and `REDIS_H
 ### **2.3 Terminate the application**
 
 1. Stop the application with a keyboard shortcut `Ctrl+C`<br><br><br>
-
-
-## About additional tasks
-In homework #2, both additional tasks were completed:<br>
-> commits:<br>
-&emsp;1. [One difficult query](https://github.com/Borcheg1/FastAPI_Restaurant/commit/c32b49ed0e659735aceb776a20692161b2bde9c5)<br>
-&emsp;2. [Postman test scenario](https://github.com/Borcheg1/FastAPI_Restaurant/commit/42b84d12ea66822c3aa5e10fda0e8edabaa4ceb5)<br><br>
-now in project:<br>
-&emsp;1. [One difficult query](https://github.com/Borcheg1/FastAPI_Restaurant/blob/main/src/repository/menu_repository.py)<br>
-&emsp;2. [Postman test scenario](https://github.com/Borcheg1/FastAPI_Restaurant/blob/main/tests/test_case_suite_postman.py)<br>
-
-In homework #3, one additional task were completed:<br>
-I didn't complete task about Django reverse in tests, because in my opinion mock works much better.<br>
-> commits:<br>
-&emsp;1. [OpenAPI](https://github.com/Borcheg1/FastAPI_Restaurant/commit/d84d6e8789f5f76dc68eef0e2675a6f90c5aff57)<br><br>
-now in project:<br>
-&emsp;1. [OpenAPI](https://github.com/Borcheg1/FastAPI_Restaurant/blob/main/openapi.json)<br>
-
-In homework #4, no one tasks were completed because I didn't have time 😟 <br>
-**Update!**<br>
-The task for discounts was completed after the deadline, 17.08.<br>
-> commits:<br>
-&emsp;1. [Discounts](https://github.com/Borcheg1/FastAPI_Restaurant/tree/6b96302a7014ff45ee7542b0c1f6aa8b53c8921c/src)<br><br>
-now in project:<br>
-&emsp;1. [Discounts](https://github.com/Borcheg1/FastAPI_Restaurant/tree/main/src)<br>
